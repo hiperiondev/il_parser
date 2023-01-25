@@ -3,7 +3,6 @@ IEC61131-3 IL parser
 
 ### EXAMPLE
 ```
-
 <START>
 labels:
 [0009] while:
@@ -42,6 +41,10 @@ program:
   [0028] LD TIME#18ms
   [0029] LD DATE#2001-04-09
   [0030] LD DATE_AND_TIME#2001-04-09-11:36:15.20
+  [0031] LD "this is a string"
+  [0032] LD 'a'
+  [0033] LD 'AaBb'
+  [0034] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=_1S2)
 
 > identify literals
 > parse values
@@ -71,15 +74,19 @@ program:
 [0020] SUB MX0.0 {?#,LIT_PHY} [M, X, 0, 0]
 [0021] ST MX1.0 {?#,LIT_PHY} [M, X, 1, 0]
 [0022] JMP 9 {?#,LIT_NONE} 
-[0023] LD a_Variable_23 {?#,LIT_OTHER} [a_Variable_23]
-[0024] ST QW5.0 {?#,LIT_PHY} [Q, W, 5, 0]
+[0023] LD a_Variable_23 {?#,LIT_VAR} [a_Variable_23]
+[0024] ST QX5.0 {SINT#,LIT_PHY} [Q, X, 5, 0]
 [0025] ST QX0.0 {?#,LIT_PHY} [Q, X, 0, 0]
 [0026] LD 15 {TOD#,LIT_TIME_OF_DAY} [11, 36, 15, 20]
 [0027] LD 1 {?#,LIT_DURATION} [1, 15, 30, 60]
 [0028] LD 18 {?#,LIT_DURATION} [0, 0, 0, 18]
 [0029] LD 04 {?#,LIT_DATE} [2001, 4, 9]
-[0030] LD 04 {DT#,LIT_DATE_AND_TIME} [2001, 4, 9, 11, 36, 15, 20]
-[0031] END  {?#,LIT_NONE} 
+[0030] LD 15 {DT#,LIT_DATE_AND_TIME} [2001, 4, 9, 11, 36, 15, 20]
+[0031] LD "this is a string" {?#,LIT_STRING} ["this is a string"]
+[0032] LD 'a' {?#,LIT_STRING} ['a']
+[0033] LD 'AaBb' {?#,LIT_STRING} ['AaBb']
+[0034] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=_1S2) {?#,LIT_CAL} [CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=_1S2)]
+[0035] END  {?#,LIT_NONE} 
 
 //////////////////////////////////////
 
