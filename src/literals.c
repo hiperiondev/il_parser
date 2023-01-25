@@ -442,3 +442,8 @@ int parse_date_and_time(char *str, uint8_t *day, uint8_t *month, uint16_t *year,
 
     return 0;
 }
+
+int parse_cal(char *str) {
+    printf("CAL: %s\n", str);
+    return 0;
+}

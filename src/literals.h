@@ -47,5 +47,6 @@ void identify_literal(char *str, uint8_t *datatype, uint8_t *dataformat, char **
  int parse_time_of_day(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec);
  int parse_calendar_date(char *str, uint8_t *day, uint8_t *month, uint16_t *year);
  int parse_date_and_time(char *str, uint8_t *day, uint8_t *month, uint16_t *year, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec);
+ int parse_cal(char *str);
 
 #endif /* LITERALS_H_ */

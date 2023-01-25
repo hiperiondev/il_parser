@@ -53,7 +53,8 @@ const char *dataformat_[] = {
     "LIT_BASE16",        // 0x0a
     "LIT_PHY",           // 0x0b
     "LIT_OTHER",         // 0x0c
-    "LIT_NONE"           // 0
+    "LIT_CAL",           // 0x0d
+    "LIT_NONE"           //
 };
 
 il_str_t commands[55] = {
@@ -224,17 +225,16 @@ const char *cmds[] = {
                       break;                                                                                         \
                 case LIT_REAL:                                                                                       \
                 case LIT_REAL_EXP:                                                                                   \
-				      printf("[%f]\n",                                                                               \
-				          line_parsed[pos].data.real                                                                 \
-				      );                                                                                             \
+				      printf("[%f]\n", line_parsed[pos].data.real);                                                  \
                       break;                                                                                         \
                 case LIT_BOOLEAN:                                                                                    \
                 case LIT_BASE2:                                                                                      \
                 case LIT_BASE8:                                                                                      \
                 case LIT_BASE16:                                                                                     \
-                      printf("[%zu]\n",                                                                              \
-                           line_parsed[pos].data.uinteger                                                            \
-                      );                                                                                             \
+                      printf("[%zu]\n", line_parsed[pos].data.uinteger);                                             \
+                      break;                                                                                         \
+                case LIT_CAL:                                                                                        \
+				      printf("[%s]\n", temp_string);                                                                 \
                       break;                                                                                         \
                 case LIT_OTHER:                                                                                      \
 				      printf("[%s]\n", temp_string);                                                                 \
@@ -374,6 +374,11 @@ void compile_il(char *file) {
         if (line_parsed[pos].str == NULL || line_parsed[pos].code == IL_JMP) {
             line_parsed[pos].data_type = datatype;
             line_parsed[pos].data_format = dataformat;
+            continue;
+        }
+
+        if(line_parsed[pos].code == IL_CAL){
+            line_parsed[pos].data_format = LIT_CAL;
             continue;
         }
 
@@ -527,6 +532,16 @@ void compile_il(char *file) {
                         );
                 if (resultfn != 0) {
                     printf("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
+                    printf("----\n\n");
+                    exit(1);
+                }
+                break;
+
+            case LIT_CAL:
+                resultfn = parse_cal(line_parsed[pos].str);
+
+                if (resultfn != 0) {
+                    printf("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
                     printf("----\n\n");
                     exit(1);
                 }
