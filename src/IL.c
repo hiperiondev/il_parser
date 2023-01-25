@@ -37,7 +37,7 @@
 
 #include "IL.h"
 #include "strings.h"
-#include "literals.h"
+#include "parser.h"
 
 const char *dataformat_[] = {
     "LIT_BOOLEAN",       // 0x00
@@ -152,80 +152,80 @@ const char *cmds[] = {
 };
 
 #define PRINT_PARSED_LINE(pos)                                                                                       \
-	        char addr[2048], temp_string[2048]="";                                                                   \
-		    sprintf(addr, "%u", line_parsed[pos].data.jmp_addr);                                                     \
-		    if(line_parsed[pos].code != IL_JMP) {                                                                    \
-		        if (line_parsed[pos].data_format == LIT_PHY)                                                         \
-			        sprintf(temp_string, "%c%c%u.%u",                                                                \
-			            phy_prefix_c[line_parsed[pos].data.phy.prefix],                                              \
-	                    phy_data_type_c[line_parsed[pos].data.phy.datatype],                                         \
-	                    line_parsed[pos].data.phy.phy_a,                                                             \
-	                    line_parsed[pos].data.phy.phy_b                                                              \
-	                 );                                                                                              \
+            char addr[2048], temp_string[2048]="";                                                                   \
+            sprintf(addr, "%u", line_parsed[pos].data.jmp_addr);                                                     \
+            if(line_parsed[pos].code != IL_JMP) {                                                                    \
+                if (line_parsed[pos].data_format == LIT_PHY)                                                         \
+                    sprintf(temp_string, "%c%c%u.%u",                                                                \
+                        phy_prefix_c[line_parsed[pos].data.phy.prefix],                                              \
+                        phy_data_type_c[line_parsed[pos].data.phy.datatype],                                         \
+                        line_parsed[pos].data.phy.phy_a,                                                             \
+                        line_parsed[pos].data.phy.phy_b                                                              \
+                     );                                                                                              \
                 else                                                                                                 \
                     if(line_parsed[pos].str != NULL)                                                                 \
                         sprintf(temp_string, "%s", line_parsed[pos].str);                                            \
-		    }                                                                                                        \
-		    printf("[%04d] %s%s%s%s %s {%s,%s} ",                                                                    \
-		            pos + 1,                                                                                         \
-		            cmds[line_parsed[pos].code],                                                                     \
-		            line_parsed[pos].c ? "C" : "",                                                                   \
-		            line_parsed[pos].n ? "N" : "",                                                                   \
-		            line_parsed[pos].p ? "(" : "",                                                                   \
-		            line_parsed[pos].code == IL_JMP ? addr : temp_string,                                            \
-		            IEC_IECTYPE_PFX[line_parsed[pos].data_type], dataformat_[line_parsed[pos].data_format]           \
-		    );                                                                                                       \
-		    switch(line_parsed[pos].data_format) {                                                                   \
+            }                                                                                                        \
+            printf("[%04d] %s%s%s%s %s {%s,%s} ",                                                                    \
+                    pos + 1,                                                                                         \
+                    cmds[line_parsed[pos].code],                                                                     \
+                    line_parsed[pos].c ? "C" : "",                                                                   \
+                    line_parsed[pos].n ? "N" : "",                                                                   \
+                    line_parsed[pos].p ? "(" : "",                                                                   \
+                    line_parsed[pos].code == IL_JMP ? addr : temp_string,                                            \
+                    IEC_IECTYPE_PFX[line_parsed[pos].data_type], dataformat_[line_parsed[pos].data_format]           \
+            );                                                                                                       \
+            switch(line_parsed[pos].data_format) {                                                                   \
                 case LIT_PHY:                                                                                        \
-                     printf("[%c, %c, %d, %d]\n",                                                                    \
+                      printf("[%c, %c, %d, %d]\n",                                                                   \
                           phy_prefix_c[line_parsed[pos].data.phy.prefix],                                            \
-						  phy_data_type_c[line_parsed[pos].data.phy.datatype],                                       \
+                          phy_data_type_c[line_parsed[pos].data.phy.datatype],                                       \
                           line_parsed[pos].data.phy.phy_a,                                                           \
                           line_parsed[pos].data.phy.phy_b                                                            \
                       );                                                                                             \
                       break;                                                                                         \
                 case LIT_DURATION:                                                                                   \
-				      printf("[%d, %d, %d, %d]\n",                                                                   \
-						  line_parsed[pos].data.tod.hour,                                                            \
-						  line_parsed[pos].data.tod.min,                                                             \
-						  line_parsed[pos].data.tod.sec,                                                             \
-						  line_parsed[pos].data.tod.msec                                                             \
+                      printf("[%d, %d, %d, %d]\n",                                                                   \
+                          line_parsed[pos].data.tod.hour,                                                            \
+                          line_parsed[pos].data.tod.min,                                                             \
+                          line_parsed[pos].data.tod.sec,                                                             \
+                          line_parsed[pos].data.tod.msec                                                             \
                       );                                                                                             \
                       break;                                                                                         \
                 case LIT_DATE:                                                                                       \
-				      printf("[%d, %d, %d]\n",                                                                       \
-				          line_parsed[pos].data.date_and_time.date.year,                                             \
-				          line_parsed[pos].data.date_and_time.date.month,                                            \
-				          line_parsed[pos].data.date_and_time.date.day                                               \
-				      );                                                                                             \
-				      break;                                                                                         \
+                      printf("[%d, %d, %d]\n",                                                                       \
+                          line_parsed[pos].data.date_and_time.date.year,                                             \
+                          line_parsed[pos].data.date_and_time.date.month,                                            \
+                          line_parsed[pos].data.date_and_time.date.day                                               \
+                      );                                                                                             \
+                      break;                                                                                         \
                 case LIT_TIME_OF_DAY:                                                                                \
-				      printf("[%d, %d, %d, %d]\n",                                                                   \
-				          line_parsed[pos].data.tod.hour,                                                            \
-				          line_parsed[pos].data.tod.min,                                                             \
-				          line_parsed[pos].data.tod.sec,                                                             \
-				          line_parsed[pos].data.tod.msec                                                             \
+                      printf("[%d, %d, %d, %d]\n",                                                                   \
+                          line_parsed[pos].data.tod.hour,                                                            \
+                          line_parsed[pos].data.tod.min,                                                             \
+                          line_parsed[pos].data.tod.sec,                                                             \
+                          line_parsed[pos].data.tod.msec                                                             \
                       );                                                                                             \
                       break;                                                                                         \
                 case LIT_DATE_AND_TIME:                                                                              \
-				      printf("[%d, %d, %d, %d, %d, %d, %d]\n",                                                       \
-						  line_parsed[pos].data.date_and_time.date.year,                                             \
-						  line_parsed[pos].data.date_and_time.date.month,                                            \
-						  line_parsed[pos].data.date_and_time.date.day,                                              \
-				          line_parsed[pos].data.date_and_time.tod.hour,                                              \
-				          line_parsed[pos].data.date_and_time.tod.min,                                               \
-				          line_parsed[pos].data.date_and_time.tod.sec,                                               \
-				          line_parsed[pos].data.date_and_time.tod.msec                                               \
+                      printf("[%d, %d, %d, %d, %d, %d, %d]\n",                                                       \
+                          line_parsed[pos].data.date_and_time.date.year,                                             \
+                          line_parsed[pos].data.date_and_time.date.month,                                            \
+                          line_parsed[pos].data.date_and_time.date.day,                                              \
+                          line_parsed[pos].data.date_and_time.tod.hour,                                              \
+                          line_parsed[pos].data.date_and_time.tod.min,                                               \
+                          line_parsed[pos].data.date_and_time.tod.sec,                                               \
+                          line_parsed[pos].data.date_and_time.tod.msec                                               \
                       );                                                                                             \
                       break;                                                                                         \
                 case LIT_INTEGER:                                                                                    \
-				      printf("[%ld]\n",                                                                              \
-				          line_parsed[pos].data.integer                                                              \
-				      );                                                                                             \
+                      printf("[%ld]\n",                                                                              \
+                          line_parsed[pos].data.integer                                                              \
+                      );                                                                                             \
                       break;                                                                                         \
                 case LIT_REAL:                                                                                       \
                 case LIT_REAL_EXP:                                                                                   \
-				      printf("[%f]\n", line_parsed[pos].data.real);                                                  \
+                      printf("[%f]\n", line_parsed[pos].data.real);                                                  \
                       break;                                                                                         \
                 case LIT_BOOLEAN:                                                                                    \
                 case LIT_BASE2:                                                                                      \
@@ -234,14 +234,14 @@ const char *cmds[] = {
                       printf("[%zu]\n", line_parsed[pos].data.uinteger);                                             \
                       break;                                                                                         \
                 case LIT_CAL:                                                                                        \
-				      printf("[%s]\n", temp_string);                                                                 \
+                      printf("[%s]\n", temp_string);                                                                 \
                       break;                                                                                         \
                 case LIT_OTHER:                                                                                      \
-				      printf("[%s]\n", temp_string);                                                                 \
+                      printf("[%s]\n", temp_string);                                                                 \
                       break;                                                                                         \
                  default:                                                                                            \
                       printf("\n");                                                                                  \
-		     }
+             }
 
 //////////////////////////////////
 
@@ -264,14 +264,14 @@ void compile_il(char *file) {
     labels_qty = 0;
     f = fopen(file, "r");
     if (f == NULL) {
-        printf("Error: can't open file\n");
+        DBG_PRINT("Error: can't open file\n");
         exit(1);
     }
 
-    printf("<START>\n");
+    DBG_PRINT("<START>\n");
 
 // first pass: localize labels
-    printf("labels:\n");
+    DBG_PRINT("labels:\n");
     while (fgets(line, 512, f)) {
         if (isBlank(line))
             continue;
@@ -285,17 +285,17 @@ void compile_il(char *file) {
         memcpy(labels[pos].label, line, index);
         labels_qty++;
         labels[pos].line = pc;
-        printf("[%04d] %s:\n", labels[pos].line, labels[pos].label);
+        DBG_PRINT("[%04d] %s:\n", labels[pos].line, labels[pos].label);
         ++pos;
 
         labels = realloc(labels, (pos + 1) * sizeof(label_t));
     }
-    printf("\n");
+    DBG_PRINT("\n");
     rewind(f);
     pc = 0;
 
 // second pass: compile
-    printf("program:\n");
+    DBG_PRINT("program:\n");
     while (fgets(line, 512, f)) {
         if (isBlank(line))
             continue;
@@ -316,7 +316,7 @@ void compile_il(char *file) {
         }
 
         ln = trim(line);
-        printf("  [%04d] %s\n", pc, ln);
+        DBG_PRINT("  [%04d] %s\n", pc, ln);
 
         // parse command
         split2(ln, ' ', &left, &right);
@@ -330,7 +330,7 @@ void compile_il(char *file) {
             }
         }
         if (index == 255) {
-            printf("[%s]\nerror: command not found or malformed\n", str_tmp);
+            DBG_PRINT("[%s]\nerror: command not found or malformed\n", str_tmp);
             exit(1);
         }
 
@@ -343,7 +343,7 @@ void compile_il(char *file) {
                 }
             }
             if (line_parsed[lines - 1].data.jmp_addr == 0) {
-                printf("\nerror: label not exist\n%s\n", ln);
+                DBG_PRINT("\nerror: label not exist\n%s\n", ln);
                 exit(1);
             }
         }
@@ -366,7 +366,7 @@ void compile_il(char *file) {
 
     // third pass: evaluate arguments
 
-    printf("\n> identify literals\n");
+    DBG_PRINT("\n> identify literals\n");
     for (pos = 0; pos < lines; pos++) {
         datatype = IEC_T_NULL;
         dataformat = LIT_NONE;
@@ -395,14 +395,14 @@ void compile_il(char *file) {
         free(value);
     }
 
-    printf("> parse values\n");
+    DBG_PRINT("> parse values\n");
     for (pos = 0; pos < lines; pos++) {
         switch (line_parsed[pos].data_format) {
             case LIT_BOOLEAN:
                 resultfn = str2int(&value, line_parsed[pos].str, 2);
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown boolean\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown boolean\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 line_parsed[pos].data.uinteger = value;
@@ -417,8 +417,8 @@ void compile_il(char *file) {
                         &(line_parsed[pos].data.tod.msec)
                         );
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown duration\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown duration\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -431,8 +431,8 @@ void compile_il(char *file) {
                         &(line_parsed[pos].data.date_and_time.date.year)
                         );
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -446,8 +446,8 @@ void compile_il(char *file) {
                         &(line_parsed[pos].data.tod.msec)
                         );
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -464,8 +464,8 @@ void compile_il(char *file) {
                         &(line_parsed[pos].data.date_and_time.tod.msec));
 
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -473,8 +473,8 @@ void compile_il(char *file) {
             case LIT_INTEGER:
                 resultfn = str2int(&value, line_parsed[pos].str, 10);
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown integer\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown integer\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 line_parsed[pos].data.integer = value;
@@ -492,8 +492,8 @@ void compile_il(char *file) {
             case LIT_BASE2:
                 resultfn = str2int(&value, line_parsed[pos].str, 2);
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown integer base 2\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown integer base 2\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 line_parsed[pos].data.uinteger = value;
@@ -503,8 +503,8 @@ void compile_il(char *file) {
             case LIT_BASE8:
                 resultfn = str2int(&value, line_parsed[pos].str, 8);
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown integer base 8\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown integer base 8\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 line_parsed[pos].data.uinteger = value;
@@ -514,8 +514,8 @@ void compile_il(char *file) {
             case LIT_BASE16:
                 resultfn = str2int(&value, line_parsed[pos].str, 16);
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown integer base 16\n", pos);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown integer base 16\n", pos);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 line_parsed[pos].data.uinteger = value;
@@ -531,8 +531,8 @@ void compile_il(char *file) {
                         &(line_parsed[pos].data.phy.phy_b)
                         );
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -541,8 +541,8 @@ void compile_il(char *file) {
                 resultfn = parse_cal(line_parsed[pos].str);
 
                 if (resultfn != 0) {
-                    printf("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
-                    printf("----\n\n");
+                    DBG_PRINT("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
+                    DBG_PRINT("----\n\n");
                     exit(1);
                 }
                 break;
@@ -554,8 +554,8 @@ void compile_il(char *file) {
                 break;
 
             default:
-                printf("Line %04d -> error: unknown literal type\n", pos);
-                printf("----\n\n");
+                DBG_PRINT("Line %04d -> error: unknown literal type\n", pos);
+                DBG_PRINT("----\n\n");
                 exit(1);
         }
     }

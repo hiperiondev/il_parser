@@ -1,5 +1,5 @@
 /**
- * @file literals.c
+ * @file parser.c
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
@@ -36,7 +36,7 @@
 #include <math.h>
 
 #include "IL.h"
-#include "literals.h"
+#include "parser.h"
 #include "strings.h"
 
 const char *IEC_DATAFORMAT_PFX[] = {

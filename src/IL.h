@@ -34,13 +34,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "literals.h"
+#include "parser.h"
 
 #define DEBUG
 
 #ifdef DEBUG
     #define DBG_PRINT(fmt, args...)  \
-                fprintf(stderr, "" fmt, ##args)
+                printf(fmt, ##args)
 #else
     #define DBG_PRINT(fmt, args...)
 #endif
@@ -101,38 +101,38 @@ typedef enum DATAFORMAT {
 } dataformat_t;
 
 typedef enum {
-    IEC_T_NULL    = 0x00,  /**< not value */
-    IEC_T_BOOL    = 0x01,  /**< bool */
-    IEC_T_SINT    = 0x02,  /**< int8_t */
-    IEC_T_USINT   = 0x03,  /**< uint8_t */
-    IEC_T_BYTE    = 0x04,  /**< uint8_t */
-    IEC_T_INT     = 0x05,  /**< int16_t */
-    IEC_T_UINT    = 0x06,  /**< uint16_t */
-    IEC_T_WORD    = 0x07,  /**< uint16_t */
-    IEC_T_DINT    = 0x08,  /**< int32_t */
-    IEC_T_UDINT   = 0x09,  /**< uint32_t */
-    IEC_T_DWORD   = 0x0a,  /**< uint32_t */
-    IEC_T_LINT    = 0x0b,  /**< int64_t */
-    IEC_T_ULINT   = 0x0c,  /**< uint64_t */
-    IEC_T_LWORD   = 0x0d,  /**< int64_t */
-    IEC_T_REAL    = 0x0e,  /**< float */
-    IEC_T_LREAL   = 0x0f,  /**< double */
-    IEC_T_TIME    = 0x10,  /**< time_t */
-    IEC_T_DATE    = 0x11,  /**< date_t */
-    IEC_T_TOD     = 0x12,  /**< tod_t */
-    IEC_T_DT      = 0x13,  /**< dat_t */
-    IEC_T_CHAR    = 0x14,  /**< char */
-    IEC_T_WCHAR   = 0x15,  /**< wchar */
-    IEC_T_STRING  = 0x16,  /**< string_t */
-    IEC_T_WSTRING = 0x17,  /**< string_t */
-    IEC_T_POINTER = 0x18,  /**< pointer_t */
-    IEC_T_TABLE   = 0x19,  /**< table_t */
-    IEC_T_USER    = 0x1a,  /**< user_t */
-    IEC_T_R_EDGE  = 0x1b,  /**< bool */
-    IEC_T_F_EDGE  = 0x1c,  /**< bool */
-    IEC_T_TIMER   = 0x1d,  /**< timer_t */
-    IEC_T_VAR     = 0x1e,  /**< variable */
-    IEC_T_PHY     = 0x1f,  /**< physical address */
+    IEC_T_NULL    = 0x00, // not value
+    IEC_T_BOOL    = 0x01, // bool
+    IEC_T_SINT    = 0x02, // int8_t
+    IEC_T_USINT   = 0x03, // uint8_t
+    IEC_T_BYTE    = 0x04, // uint8_t
+    IEC_T_INT     = 0x05, // int16_t
+    IEC_T_UINT    = 0x06, // uint16_t
+    IEC_T_WORD    = 0x07, // uint16_t
+    IEC_T_DINT    = 0x08, // int32_t
+    IEC_T_UDINT   = 0x09, // uint32_t
+    IEC_T_DWORD   = 0x0a, // uint32_t
+    IEC_T_LINT    = 0x0b, // int64_t
+    IEC_T_ULINT   = 0x0c, // uint64_t
+    IEC_T_LWORD   = 0x0d, // int64_t
+    IEC_T_REAL    = 0x0e, // float
+    IEC_T_LREAL   = 0x0f, // double
+    IEC_T_TIME    = 0x10, // time_t
+    IEC_T_DATE    = 0x11, // date_t
+    IEC_T_TOD     = 0x12, // tod_t
+    IEC_T_DT      = 0x13, // dat_t
+    IEC_T_CHAR    = 0x14, // char
+    IEC_T_WCHAR   = 0x15, // wchar
+    IEC_T_STRING  = 0x16, // string_t
+    IEC_T_WSTRING = 0x17, // string_t
+    IEC_T_POINTER = 0x18, // pointer_t
+    IEC_T_TABLE   = 0x19, // table_t
+    IEC_T_USER    = 0x1a, // user_t
+    IEC_T_R_EDGE  = 0x1b, // bool
+    IEC_T_F_EDGE  = 0x1c, // bool
+    IEC_T_TIMER   = 0x1d, // timer_t
+    IEC_T_VAR     = 0x1e, // variable
+    IEC_T_PHY     = 0x1f, // physical address
 } iectype_t;
 
 typedef enum PHY_PREFIX {
@@ -149,58 +149,65 @@ typedef enum PHY_DATA_TYPE {
     PHY_DOUBLE //
 } phy_data_type_t;
 
-typedef struct il_cmd_str {
-            char *str;          //
-    il_commands_t code;         // IL code
-             bool c;            // conditional
-             bool n;            // negate
-             bool p;            // push '('
-          uint8_t data_type;    //
-          uint8_t data_format;  //
+typedef struct il_cmd_str il_cmd_str_t;
+struct il_cmd_str {
+             char *str;          //
+    il_commands_t code;          // IL code
+             bool c;             // conditional
+             bool n;             // negate
+             bool p;             // push '('
+          uint8_t data_type;     //
+          uint8_t data_format;   //
     union {
-          double real;          //
-        uint32_t jmp_addr;      //
-        uint64_t uinteger;      //
-         int64_t integer;       //
+          double real;           //
+        uint32_t jmp_addr;       //
+        uint64_t uinteger;       //
+         int64_t integer;        //
         struct {
-             uint8_t prefix;    //
-             uint8_t datatype;  //
-            uint32_t phy_a;     //
-            uint32_t phy_b;     //
-        } phy;                  //
+                uint16_t len;    //
+                    char *func;  //
+                    char **var;  //
+            il_cmd_str_t *value; //
+        } cal;                   //
         struct {
-             uint8_t day;       //
-             uint8_t month;     //
-            uint16_t year;      //
-        } date;                 //
+             uint8_t prefix;     //
+             uint8_t datatype;   //
+            uint32_t phy_a;      //
+            uint32_t phy_b;      //
+        } phy;                   //
         struct {
-            uint8_t msec;       //
-            uint8_t sec;        //
-            uint8_t min;        //
-            uint8_t hour;       //
-        } tod;                  //
+             uint8_t day;        //
+             uint8_t month;      //
+            uint16_t year;       //
+        } date;                  //
+        struct {
+            uint8_t msec;        //
+            uint8_t sec;         //
+            uint8_t min;         //
+            uint8_t hour;        //
+        } tod;                   //
         struct {
             struct {
-                 uint8_t day;   //
-                 uint8_t month; //
-                uint16_t year;  //
-            } date;             //
+                 uint8_t day;    //
+                 uint8_t month;  //
+                uint16_t year;   //
+            } date;              //
             struct {
-                uint8_t msec;   //
-                uint8_t sec;    //
-                uint8_t min;    //
-                uint8_t hour;   //
-            } tod;              //
-        } date_and_time;        //
-    } data;                     //
-} il_cmd_str_t;
+                uint8_t msec;    //
+                uint8_t sec;     //
+                uint8_t min;     //
+                uint8_t hour;    //
+            } tod;               //
+        } date_and_time;         //
+    } data;                      //
+};
 
 typedef struct il_str {
-        char *str;
-     uint8_t code;
-        bool c; // conditional
-        bool n; // negate
-        bool p; // push '('
+        char *str; //
+     uint8_t code; //
+        bool c;    // conditional
+        bool n;    // negate
+        bool p;    // push '('
 } il_str_t;
 
 typedef struct label {

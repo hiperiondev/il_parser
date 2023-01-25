@@ -1,5 +1,5 @@
 /**
- * @file literals.h
+ * @file parser.h
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
