@@ -165,11 +165,16 @@ void identify_literal(il_t *line, char **value) {
         goto end;
     }
 
-	if ((*line).data_type == IEC_T_DT) { // id DT
+	if ((*line).data_type == IEC_T_DT) { // is DT
 	    (*line).data_format = LIT_DATE_AND_TIME;
         goto end;
     }
 
+	if ((ln[0] == '"' && ln[strlen(ln) - 1] == '"') || (ln[0] == '\'' && ln[strlen(ln) - 1] == '\'')) {
+	    (*line).data_format = LIT_STRING;
+	    ln = (*line).str;
+	    goto end;
+	}
 	// search data prefix
 	uint8_t dformat = LIT_NONE;
 	for (n = 0; n < 9; n++) {

@@ -51,9 +51,10 @@ const char *dataformat_[] = {
     "LIT_BASE2",         // 0x08
     "LIT_BASE8",         // 0x09
     "LIT_BASE16",        // 0x0a
-    "LIT_PHY",           // 0x0b
-    "LIT_OTHER",         // 0x0c
-    "LIT_CAL",           // 0x0d
+    "LIT_PHY",           // 0x0c
+    "LIT_STRING",        // 0x0d
+    "LIT_OTHER",         // 0x0e
+    "LIT_CAL",           // 0x0f
     "LIT_NONE"           //
 };
 
@@ -234,8 +235,7 @@ const char *cmds[] = {
                       printf("[%zu]\n", line_parsed[pos].data.uinteger);                                    \
                       break;                                                                                \
                 case LIT_CAL:                                                                               \
-                      printf("[%s]\n", temp_string);                                                        \
-                      break;                                                                                \
+                case LIT_STRING:                                                                            \
                 case LIT_OTHER:                                                                             \
                       printf("[%s]\n", temp_string);                                                        \
                       break;                                                                                \
@@ -249,7 +249,6 @@ void compile_il(char *file) {
     uint8_t datatype, dataformat;
     FILE *f;
     char line[512];
-    //char ln_ins[2][50] = { "", "" };
     char *ln = NULL, *str_tmp = NULL;
     char *ptr;
     int index, pc = 0, pos = 0, labels_qty, resultfn;
@@ -512,9 +511,8 @@ void compile_il(char *file) {
                 }
                 break;
 
+            case LIT_STRING:
             case LIT_NONE:
-                break;
-
             case LIT_OTHER:
                 break;
 

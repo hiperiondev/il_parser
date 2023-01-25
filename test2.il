@@ -29,4 +29,6 @@ end:      ST %q0.0
           LD DATE#2001-04-09
           LD DATE_AND_TIME#2001-04-09-11:36:15.20
           LD "this is a string"
+          LD 'a'
+          LD 'AaBb'
           CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=_1S2)
