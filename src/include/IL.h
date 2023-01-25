@@ -95,7 +95,7 @@ typedef enum DATAFORMAT {
     LIT_BASE16,        // 0x0a
     LIT_PHY,           // 0x0b
     LIT_STRING,        // 0x0c
-    LIT_OTHER,         // 0x0d
+    LIT_VAR,           // 0x0d
     LIT_CAL,           // 0x0e
     /* ... */
     LIT_NONE

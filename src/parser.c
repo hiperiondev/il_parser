@@ -63,7 +63,7 @@ const uint8_t IEC_LITERAL_FORMAT[]= {
     LIT_DATE_AND_TIME,
     LIT_DATE_AND_TIME,
 	LIT_PHY,
-	LIT_OTHER
+	LIT_VAR
 };
 
 const char *IEC_IECTYPE_PFX[] = {
@@ -135,7 +135,7 @@ void identify_literal(il_t *line, char **value) {
 	// delete _
 	ln = strremove(ln, "_");
 
-	(*line).data_format = LIT_OTHER;
+	(*line).data_format = LIT_VAR;
 
 	// search typed literal
 	(*line).data_type = 0;

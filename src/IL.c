@@ -53,7 +53,7 @@ const char *dataformat_[] = {
     "LIT_BASE16",        // 0x0a
     "LIT_PHY",           // 0x0c
     "LIT_STRING",        // 0x0d
-    "LIT_OTHER",         // 0x0e
+    "LIT_VAR",           // 0x0e
     "LIT_CAL",           // 0x0f
     "LIT_NONE"           //
 };
@@ -236,7 +236,7 @@ const char *cmds[] = {
                       break;                                                                                \
                 case LIT_CAL:                                                                               \
                 case LIT_STRING:                                                                            \
-                case LIT_OTHER:                                                                             \
+                case LIT_VAR:                                                                               \
                       printf("[%s]\n", temp_string);                                                        \
                       break;                                                                                \
                  default:                                                                                   \
@@ -513,7 +513,7 @@ void compile_il(char *file) {
 
             case LIT_STRING:
             case LIT_NONE:
-            case LIT_OTHER:
+            case LIT_VAR:
                 break;
 
             default:
