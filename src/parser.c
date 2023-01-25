@@ -114,12 +114,13 @@ const char phy_data_type_c[] = {
     'D'
 };
 
-void identify_literal(char *str, uint8_t *datatype, uint8_t *dataformat, char **value) {
+void identify_literal(il_t *line, char **value) {
 	uint8_t n;
 	char *ln = NULL;
 
-	ln = trim(str);
+	ln = trim((*line).str);
 	toUpperCase(ln);
+
 	// replace boolean type
 	replacestr(ln, "TRUE", "1");
 	replacestr(ln, "FALSE", "0");
@@ -134,38 +135,38 @@ void identify_literal(char *str, uint8_t *datatype, uint8_t *dataformat, char **
 	// delete _
 	ln = strremove(ln, "_");
 
-	*dataformat = LIT_OTHER;
+	(*line).data_format = LIT_OTHER;
 
 	// search typed literal
-	*datatype = 0;
+	(*line).data_type = 0;
 	for (n = 1; n < 32; n++) {
 		if (strstr(ln, IEC_IECTYPE_PFX[n]) == ln) {
-			*datatype = n;
+		    (*line).data_type = n;
 			break;
 		}
 	}
 
-	if (*datatype != 0)
+	if ((*line).data_type != 0)
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
 
-	if (*datatype == 1) { // is bool
-		*dataformat = LIT_BOOLEAN;
+	if ((*line).data_type == IEC_T_BOOL) { // is bool
+	    (*line).data_format = LIT_BOOLEAN;
 		goto end;
 	}
 
-	if (*datatype == 31) { // is phy
-		*datatype = 0;
-		*dataformat = LIT_PHY;
+	if ((*line).data_type == IEC_T_PHY) { // is phy
+	    (*line).data_type = 0;
+		(*line).data_format = LIT_PHY;
 		goto end;
 	}
 
-	if (*datatype == IEC_T_TOD) {
-        *dataformat = LIT_TIME_OF_DAY;
+	if ((*line).data_type == IEC_T_TOD) { //is TOD
+	    (*line).data_format = LIT_TIME_OF_DAY;
         goto end;
     }
 
-	if (*datatype == IEC_T_DT) {
-        *dataformat = LIT_DATE_AND_TIME;
+	if ((*line).data_type == IEC_T_DT) { // id DT
+	    (*line).data_format = LIT_DATE_AND_TIME;
         goto end;
     }
 
@@ -178,111 +179,113 @@ void identify_literal(char *str, uint8_t *datatype, uint8_t *dataformat, char **
 		}
 	}
 
+	// erase data format prefix
 	if (dformat != LIT_NONE) {
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
-		*dataformat = IEC_LITERAL_FORMAT[dformat];
+		(*line).data_format = IEC_LITERAL_FORMAT[dformat];
 		goto end;
 	}
 
 	if(dformat == LIT_DURATION) {
-	    *dataformat = LIT_DURATION;
-	    *datatype = IEC_T_TIME;
+	    (*line).data_format = LIT_DURATION;
+	    (*line).data_type = IEC_T_TIME;
 	    goto end;
 	}
 
-	if (!strcmp(str, "0") || !strcmp(str, "1")) {
-		*dataformat = LIT_BOOLEAN;
+	if (!strcmp((*line).str, "0") || !strcmp((*line).str, "1")) {
+	    (*line).data_format = LIT_BOOLEAN;
 		goto end;
 	}
 
 	if (strisinteger(ln)) {
-		*dataformat = LIT_INTEGER;
+	    (*line).data_format = LIT_INTEGER;
 		goto end;
 	}
 
 	if (strisfloat(ln)) {
-		*dataformat = LIT_REAL;
+	    (*line).data_format = LIT_REAL;
 		goto end;
     }
 
     if (strisrealexp(ln)) {
-        *dataformat = LIT_REAL_EXP;
+        (*line).data_format = LIT_REAL_EXP;
         goto end;
     }
 
-	ln = str;
+	ln = (*line).str;
 
 	end:
+
 	*value = calloc(strlen(ln) + 1, sizeof(char));
 	memcpy(*value, ln, strlen(ln));
 }
 
-int parse_phy(char *str, uint8_t *prefix, uint8_t *datatype, uint32_t *phy_a, uint32_t *phy_b) {
+int parse_phy(il_t *line) {
     int n, t = 1;
     char *left, *right;
     long int phy_v;
 
-    *prefix = PHY_NONE;
+    (*line).data.phy.prefix = PHY_NONE;
     for (n = 0; n <= PHY_M; n++) {
-        if (str[0] == phy_prefix_c[n]) {
-            *prefix = n;
+        if ((*line).str[0] == phy_prefix_c[n]) {
+            (*line).data.phy.prefix = n;
             break;
         }
 
     }
-    if (*prefix == PHY_NONE)
+    if ((*line).data.phy.prefix == PHY_NONE)
         return -2;
 
-    *datatype = PHY_BIT;
+    (*line).data_type = PHY_BIT;
     for (n = 0; n <= PHY_DOUBLE; n++) {
-        if (str[1] == phy_data_type_c[n]) {
-            *datatype = n;
+        if ((*line).str[1] == phy_data_type_c[n]) {
+            (*line).data_type = n;
             t++;
             break;
         }
     }
 
-    memmove(str, str + t, strlen(str) - t + 1);
+    memmove((*line).str, (*line).str + t, strlen((*line).str) - t + 1);
 
-    if (*datatype == PHY_BIT) {
-        if (!strisfloat(str))
+    if ((*line).data_type == PHY_BIT) {
+        if (!strisfloat((*line).str))
             return -3;
 
-        split2(str, '.', &left, &right);
+        split2((*line).str, '.', &left, &right);
 
         n = str2int(&phy_v, left, 10);
         if (n != STR2INT_SUCCESS || phy_v < 0)
             return -4;
-        *phy_a = phy_v;
+        (*line).data.phy.phy_a = phy_v;
 
         n = str2int(&phy_v, right, 10);
         if (n != STR2INT_SUCCESS || phy_v < 0)
             return -5;
-        *phy_b = phy_v;
+        (*line).data.phy.phy_b = phy_v;
 
         return 0;
     }
 
-    n = str2int(&phy_v, str, 10);
+    n = str2int(&phy_v, (*line).str, 10);
     if (n != STR2INT_SUCCESS || phy_v < 0)
         return -6;
-    *phy_a = phy_v;
+    (*line).data.phy.phy_a = phy_v;
 
     return 0;
 }
 
-int parse_time_duration(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec) {
+int parse_time_duration(il_t *line) {
     int n, h = 0, m = 0, s = 0, ms = 0, err;
     long int res;
     double integ;
     char *left, *right;
 
-    replacestr(str, "MS", "L ");
-    replacestr(str, "S", "S ");
-    replacestr(str, "M", "M ");
-    replacestr(str, "H", "H ");
+    replacestr((*line).str, "MS", "L ");
+    replacestr((*line).str, "S", "S ");
+    replacestr((*line).str, "M", "M ");
+    replacestr((*line).str, "H", "H ");
 
-    split2(str, ' ', &left, &right);
+    split2((*line).str, ' ', &left, &right);
     while ((n = strlen(left)) > 0) {
         switch (left[n - 1]) {
             case 'H':
@@ -335,38 +338,38 @@ int parse_time_duration(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, ui
     if (h > 254)
         return -1;
 
-    *hour = h;
-    *min = m;
-    *sec = s;
-    *msec = ms;
+    (*line).data.dt.tod.hour = h;
+    (*line).data.dt.tod.min = m;
+    (*line).data.dt.tod.sec = s;
+    (*line).data.dt.tod.msec = ms;
 
     return 0;
 }
 
-int parse_time_of_day(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec) {
+int parse_time_of_day(il_t *line) {
     int h = 0, m = 0, s = 0, ms = 0, err;
     long int res;
     char *right;
 
-    if (charOccurrence(str, ':') != 2)
+    if (charOccurrence((*line).str, ':') != 2)
         return -1;
 
-    split2(str, ':', &str, &right);
-    err = str2int(&res, str, 10);
+    split2((*line).str, ':', &((*line).str), &right);
+    err = str2int(&res, (*line).str, 10);
     if (err != STR2INT_SUCCESS)
         return -2;
     h = res;
 
-    memmove(str, right, strlen(right) + 1);
-    split2(str, ':', &str, &right);
-    err = str2int(&res, str, 10);
+    memmove((*line).str, right, strlen(right) + 1);
+    split2((*line).str, ':', &((*line).str), &right);
+    err = str2int(&res, (*line).str, 10);
     if (err != STR2INT_SUCCESS)
         return -3;
     m = res;
 
-    memmove(str, right, strlen(right) + 1);
-    split2(str, '.', &str, &right);
-    err = str2int(&res, str, 10);
+    memmove((*line).str, right, strlen(right) + 1);
+    split2((*line).str, '.', &((*line).str), &right);
+    err = str2int(&res, (*line).str, 10);
     if (err != STR2INT_SUCCESS)
         return -4;
     s = res;
@@ -380,70 +383,77 @@ int parse_time_of_day(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint
     if (h > 254 || m > 59 || s > 59 || ms > 999)
         return -6;
 
-    *hour = h;
-    *min = m;
-    *sec = s;
-    *msec = ms;
+    (*line).data.dt.tod.hour = h;
+    (*line).data.dt.tod.min = m;
+    (*line).data.dt.tod.sec = s;
+    (*line).data.dt.tod.msec = ms;
 
     return 0;
 }
 
-int parse_calendar_date(char *str, uint8_t *day, uint8_t *month, uint16_t *year) {
+int parse_calendar_date(il_t *line) {
     int err;
     long int res;
     char *right;
 
-    if (charOccurrence(str, '-') != 2)
+    if (charOccurrence((*line).str, '-') != 2)
         return -1;
 
-    split2(str, '-', &str, &right);
-    err = str2int(&res, str, 10);
+    split2((*line).str, '-', &((*line).str), &right);
+
+    err = str2int(&res, (*line).str, 10);
     if (err != STR2INT_SUCCESS)
         return -2;
-    *year = res;
+    (*line).data.dt.date.year = res;
 
-    memmove(str, right, strlen(right) + 1);
-    split2(str, '-', &str, &right);
-    err = str2int(&res, str, 10);
+    memmove((*line).str, right, strlen(right) + 1);
+    split2((*line).str, '-', &((*line).str), &right);
+    err = str2int(&res, (*line).str, 10);
     if (err != STR2INT_SUCCESS)
         return -3;
-    *month = res;
+    (*line).data.dt.date.month = res;
 
     err = str2int(&res, right, 10);
     if (err != STR2INT_SUCCESS)
         return -4;
-    *day = res;
+    (*line).data.dt.date.day = res;
 
     return 0;
 }
 
-int parse_date_and_time(char *str, uint8_t *day, uint8_t *month, uint16_t *year, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec) {
+int parse_date_and_time(il_t *line) {
     int cnt = 0, err;
     char *right;
-    if (charOccurrence(str, '-') != 3 && charOccurrence(str, ':') != 2)
+    if (charOccurrence((*line).str, '-') != 3 && charOccurrence((*line).str, ':') != 2)
         return -1;
 
-    for (int n = 0; n < strlen(str); n++) {
-        if (str[n] == '-')
+    for (int n = 0; n < strlen((*line).str); n++) {
+        if ((*line).str[n] == '-')
             cnt++;
         if (cnt == 3) {
-            str[n] = '@';
+            (*line).str[n] = '@';
             break;
         }
     }
-    split2(str, '@', &str, &right);
-    err = parse_calendar_date(str, day, month, year);
-    if (err != 0)
-        return -1;
 
-    err = parse_time_of_day(right, hour, min, sec, msec);
+    split2((*line).str, '@', &((*line).str), &right);
+    err = parse_calendar_date(line);
     if (err != 0)
         return -2;
+
+
+    memmove((*line).str, right, strlen(right) + 1);
+    err = parse_time_of_day(line);
+    if (err != 0)
+        return -3;
 
     return 0;
 }
 
-int parse_cal(char *str) {
-    printf("CAL: %s\n", str);
+int parse_cal(il_t *line) {
+    //int cnt = 0, err;
+    //char *right;
+    printf("CAL: %s\n", (*line).str);
+
     return 0;
 }

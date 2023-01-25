@@ -34,6 +34,7 @@
 #include <stdint.h>
 
 #include "IL.h"
+typedef struct il_cmd_str il_t;
 
 extern const char *IEC_DATAFORMAT_PFX[];
 extern const uint8_t IEC_LITERAL_FORMAT[];
@@ -41,12 +42,12 @@ extern const char *IEC_IECTYPE_PFX[];
 extern const char phy_prefix_c[];
 extern const char phy_data_type_c[];
 
-void identify_literal(char *str, uint8_t *datatype, uint8_t *dataformat, char **value);
- int parse_phy(char *str, uint8_t *prefix, uint8_t *datatype, uint32_t *phy_a, uint32_t *phy_b);
- int parse_time_duration(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec);
- int parse_time_of_day(char *str, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec);
- int parse_calendar_date(char *str, uint8_t *day, uint8_t *month, uint16_t *year);
- int parse_date_and_time(char *str, uint8_t *day, uint8_t *month, uint16_t *year, uint8_t *hour, uint8_t *min, uint8_t *sec, uint8_t *msec);
- int parse_cal(char *str);
+void identify_literal(il_t *line, char **value);
+ int parse_phy(il_t *line);
+ int parse_time_duration(il_t *line);
+ int parse_time_of_day(il_t *line);
+ int parse_calendar_date(il_t *line);
+ int parse_date_and_time(il_t *line);
+ int parse_cal(il_t *line);
 
 #endif /* LITERALS_H_ */

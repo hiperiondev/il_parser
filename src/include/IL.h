@@ -149,57 +149,46 @@ typedef enum PHY_DATA_TYPE {
     PHY_DOUBLE //
 } phy_data_type_t;
 
-typedef struct il_cmd_str il_cmd_str_t;
+typedef struct il_cmd_str il_t;
 struct il_cmd_str {
-             char *str;          //
-    il_commands_t code;          // IL code
-             bool c;             // conditional
-             bool n;             // negate
-             bool p;             // push '('
-          uint8_t data_type;     //
-          uint8_t data_format;   //
+             char *str;         //
+    il_commands_t code;         // IL code
+             bool c;            // conditional
+             bool n;            // negate
+             bool p;            // push '('
+          uint8_t data_type;    //
+          uint8_t data_format;  //
     union {
-          double real;           //
-        uint32_t jmp_addr;       //
-        uint64_t uinteger;       //
-         int64_t integer;        //
+          double real;          //
+        uint32_t jmp_addr;      //
+        uint64_t uinteger;      //
+         int64_t integer;       //
         struct {
-                uint16_t len;    //
-                    char *func;  //
-                    char **var;  //
-            il_cmd_str_t *value; //
-        } cal;                   //
+            uint16_t len;       //
+                char *func;     //
+                char **var;     //
+                il_t *value;    //
+        } cal;                  //
         struct {
-             uint8_t prefix;     //
-             uint8_t datatype;   //
-            uint32_t phy_a;      //
-            uint32_t phy_b;      //
-        } phy;                   //
-        struct {
-             uint8_t day;        //
-             uint8_t month;      //
-            uint16_t year;       //
-        } date;                  //
-        struct {
-            uint8_t msec;        //
-            uint8_t sec;         //
-            uint8_t min;         //
-            uint8_t hour;        //
-        } tod;                   //
+             uint8_t prefix;    //
+             uint8_t datatype;  //
+            uint32_t phy_a;     //
+            uint32_t phy_b;     //
+        } phy;                  //
         struct {
             struct {
-                 uint8_t day;    //
-                 uint8_t month;  //
-                uint16_t year;   //
-            } date;              //
+                 uint8_t day;   //
+                 uint8_t month; //
+                uint16_t year;  //
+            } date;             //
             struct {
-                uint8_t msec;    //
-                uint8_t sec;     //
-                uint8_t min;     //
-                uint8_t hour;    //
-            } tod;               //
-        } date_and_time;         //
-    } data;                      //
+                uint8_t msec;   //
+                uint8_t sec;    //
+                uint8_t min;    //
+                uint8_t hour;   //
+            } tod;              //
+        } dt;                   //
+    } data;                     //
 };
 
 typedef struct il_str {
