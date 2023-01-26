@@ -265,26 +265,33 @@ const char *cmds[] = {
 
 int main(void) {
     il_t *parsed = NULL;
+    int lines;
     int pos;
 
     printf("--------------------------------------------\n< START test1 >\n\n");
-    compile_il("test.il", &parsed);
+    lines = compile_il("test.il", &parsed);
 
-    printf("\n----------\n- RESULT -\n----------\n");
+    printf("\n----------\n- RESULT (%d)-\n----------\n", lines);
 
-    for (pos = 0; pos < parsed->lines; pos++) {
+    for (pos = 0; pos < lines; pos++) {
         PRINT_PARSED_LINE(parsed[pos]);
     }
+
+    free_il(&parsed, lines);
     printf("\n< END test1 >\n--------------------------------------------\n\n");
 
+    /////////////////////////////////////////////////////////////////////////////////
+
     printf("\n\n--------------------------------------------\n< START test2 >\n\n");
-    compile_il("test2.il", &parsed);
+    lines = compile_il("test2.il", &parsed);
 
-    printf("\n----------\n- RESULT -\n----------\n");
+    printf("\n----------\n- RESULT (%d)-\n----------\n", lines);
 
-    for (pos = 0; pos < parsed->lines; pos++) {
+    for (pos = 0; pos < lines; pos++) {
         PRINT_PARSED_LINE(parsed[pos]);
     }
+
+    free_il(&parsed, lines);
     printf("\n< END test2 >\n--------------------------------------------\n\n");
 
     return EXIT_SUCCESS;

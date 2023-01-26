@@ -161,7 +161,6 @@ struct il_cmd_str {
              bool p;            // push '('
           uint8_t data_type;    //
           uint8_t data_format;  //
-              int lines;        //
     union {
           double real;          //
         uint32_t jmp_addr;      //
@@ -215,6 +214,7 @@ typedef struct label {
             (v).p = 0;           \
             (v).code = IL_END;
 
-void compile_il(char *file, il_t **parsed);
+int compile_il(char *file, il_t **parsed);
+void free_il(il_t **il, int lines);
 
 #endif /* IL_H_ */
