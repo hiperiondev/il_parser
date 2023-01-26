@@ -3,6 +3,9 @@ IEC61131-3 IL parser
 
 ### EXAMPLE
 ```
+--------------------------------------------
+< START test1 >
+
 <START>
 labels:
 [none]
@@ -38,7 +41,7 @@ program:
 > parse values
 
 ----------
-- RESULT -
+- RESULT (26)-
 ----------
   [0001] LD %IX0.4 (type: NULL#, format: LIT_PHY, value: I, X, 0, 4)
   [0002] OR( %IX1.2 (type: NULL#, format: LIT_PHY, value: I, X, 1, 2)
@@ -67,7 +70,13 @@ program:
   [0025] ST %QX0.0 (type: NULL#, format: LIT_PHY, value: Q, X, 0, 0)
   [0026] END  (type: NULL#, format: LIT_NONE, value: [null])
 
-//////////////////////////////////////
+< END test1 >
+--------------------------------------------
+
+
+
+--------------------------------------------
+< START test2 >
 
 <START>
 labels:
@@ -116,7 +125,7 @@ program:
 > parse values
 
 ----------
-- RESULT -
+- RESULT (35)-
 ----------
   [0001] LD %IX0.0 (type: NULL#, format: LIT_PHY, value: I, X, 0, 0)
   [0002] ST %MX0.0 (type: NULL#, format: LIT_PHY, value: M, X, 0, 0)
@@ -151,10 +160,14 @@ program:
   [0031] LD "this is a string" (type: NULL#, format: LIT_STRING, value: "this is a string")
   [0032] LD 'a' (type: NULL#, format: LIT_STRING, value: 'a')
   [0033] LD 'AaBb' (type: NULL#, format: LIT_STRING, value: 'AaBb')
-  [0034] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string") (type: NULL#, format: LIT_CAL, value: [func: CTU_1])
+  [0034] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string") (type: NULL#, format: LIT_CAL, value: [function])
+         [fn: CTU_1]
              [var: RESET type: NULL#, format: LIT_PHY, value: I, X, 3, 6]    
              [var: PV type: NULL#, format: LIT_VAR, value: Limit]    
              [var: CU type: NULL#, format: LIT_INTEGER, value: 145]    
              [var: STR type: NULL#, format: LIT_STRING, value: "string"]    
   [0035] END  (type: NULL#, format: LIT_NONE, value: [null])
+
+< END test2 >
+--------------------------------------------
 ```
