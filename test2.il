@@ -21,7 +21,7 @@ reverse:  LD -12e-5        ; B
           ST %m1.0         ; B = B - A
           JMP while
 endwhile: LD a_Variable_23 
-          ST %qw5          ; output gcd 
+          ST %qw5          (* output gcd *) 
 end:      ST %q0.0
           LD TIME_OF_DAY#11:36:15.20
           LD TIME#1h_15m_30s_60ms

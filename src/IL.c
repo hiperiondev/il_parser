@@ -167,6 +167,7 @@ int compile_il(char *file, il_t **parsed) {
         }
 
         // erase comment
+        replacestr(line, "(*", ";");
         ptr = strchr(line, ';');
         if (ptr != NULL) {
             index = ptr - line;
