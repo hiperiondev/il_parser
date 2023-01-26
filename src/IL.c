@@ -100,7 +100,7 @@ il_str_t commands[55] = {
 
 //////////////////////////////////
 
-int compile_il(char *file, il_t **parsed) {
+int compile_il(char *file, parsed_il_t *parsed) {
     uint8_t datatype, dataformat;
     FILE *f;
     char line[512];
@@ -110,7 +110,7 @@ int compile_il(char *file, il_t **parsed) {
     label_t *labels;
     char *left = NULL, *right = NULL;
     int lines = 1;
-    il_t *line_parsed = *parsed;
+    il_t *line_parsed = parsed->result;
     line_parsed = calloc(1, sizeof(il_t));
     line_parsed[0].code = IL_END;
 
@@ -256,26 +256,25 @@ int compile_il(char *file, il_t **parsed) {
             exit(1);
     }
 
-    *parsed = line_parsed;
+    parsed->result = line_parsed;
+    parsed->lines = lines;
     return lines;
 }
 
-void free_il(il_t **il, int lines) {
-    for (int n = 0; n < lines; n++) {
-        if ((*il)[n].data_format == LIT_CAL) {
-            for (int m = 0; m < (*il)[n].data.cal.len; m++) {
-                free((*il)[n].data.cal.var[m]);
-                free((*il)[n].data.cal.value[m].str);
+void free_il(parsed_il_t *il) {
+    for (int n = 0; n < il->lines; n++) {
+        if (il->result[n].data_format == LIT_CAL) {
+            for (int m = 0; m < il->result[n].data.cal.len; m++) {
+                free(il->result[n].data.cal.var[m]);
+                free(il->result[n].data.cal.value[m].str);
             }
-            free((*il)[n].data.cal.func);
-            free((*il)[n].data.cal.var);
-            free((*il)[n].data.cal.value);
+            free(il->result[n].data.cal.func);
+            free(il->result[n].data.cal.var);
+            free(il->result[n].data.cal.value);
         } else {
-            if ((*il)[n].str != NULL)
-                free((*il)[n].str);
+            if (il->result[n].str != NULL)
+                free(il->result[n].str);
         }
     }
-
-    free(*il);
-    *il = NULL;
+    free(il->result);
 }

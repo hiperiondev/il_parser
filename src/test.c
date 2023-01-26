@@ -265,7 +265,7 @@ const char *cmds[] = {
              }
 
 int main(void) {
-    il_t *parsed = NULL;
+    parsed_il_t parsed;
     int lines;
     int pos;
 
@@ -275,10 +275,10 @@ int main(void) {
     printf("\n----------\n- RESULT (%d)-\n----------\n", lines);
 
     for (pos = 0; pos < lines; pos++) {
-        PRINT_PARSED_LINE(parsed[pos]);
+        PRINT_PARSED_LINE(parsed.result[pos]);
     }
 
-    free_il(&parsed, lines);
+    free_il(&parsed);
     printf("\n< END test1 >\n--------------------------------------------\n\n");
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -289,10 +289,10 @@ int main(void) {
     printf("\n----------\n- RESULT (%d)-\n----------\n", lines);
 
     for (pos = 0; pos < lines; pos++) {
-        PRINT_PARSED_LINE(parsed[pos]);
+        PRINT_PARSED_LINE(parsed.result[pos]);
     }
 
-    free_il(&parsed, lines);
+    free_il(&parsed);
     printf("\n< END test2 >\n--------------------------------------------\n\n");
 
     return EXIT_SUCCESS;

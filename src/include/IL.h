@@ -194,6 +194,11 @@ struct il_cmd_str {
     } data;                     //
 };
 
+typedef struct parsed_il {
+        int lines;    //
+        il_t *result; //
+} parsed_il_t;
+
 typedef struct il_str {
         char *str; //
      uint8_t code; //
@@ -214,7 +219,7 @@ typedef struct label {
             (v).p = 0;           \
             (v).code = IL_END;
 
-int compile_il(char *file, il_t **parsed);
-void free_il(il_t **il, int lines);
+int compile_il(char *file, parsed_il_t *parsed);
+void free_il(parsed_il_t *il);
 
 #endif /* IL_H_ */
