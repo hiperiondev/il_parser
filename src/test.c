@@ -177,7 +177,8 @@ const char *cmds[] = {
                       printf("%zu)\n", line.data.uinteger);                             \
                       break;                                                            \
                 case LIT_CAL:                                                           \
-                      printf("[func: %s])\n", line.data.cal.func);                      \
+                      printf("[function])\n" );                                         \
+                      printf("         [fn: %s]\n", line.data.cal.func);                \
                       for(int n = 0; n<line.data.cal.len; n++) {                        \
                           printf("             [var: %s type: %s, format: %s, value: ", \
                               line.data.cal.var[n],                                     \
