@@ -615,7 +615,6 @@ int parse_cal(il_t *line) {
 
     strremove((*line).str, " ");
     replacestr((*line).str, ":=", "=");
-    printf("str: %s\n", (*line).str);
 
     (*line).data.cal.value = malloc(sizeof(il_t));
     (*line).data.cal.var = malloc(sizeof(char*));
@@ -641,8 +640,6 @@ int parse_cal(il_t *line) {
         if (right != NULL)
             memmove((*line).str, right, strlen(right) + 1);
     }
-
-    printf("CAL: %s\n", (*line).str);
 
     return 0;
 }
