@@ -39,6 +39,26 @@
 #include "strings.h"
 #include "parser.h"
 
+#define ELEMENT_END(v)         \
+            (v).str = NULL;    \
+            (v).c = 0;         \
+            (v).n = 0;         \
+            (v).p = 0;         \
+            (v).code = IL_END;
+
+typedef struct il_str {
+        char *str; //
+     uint8_t code; //
+        bool c;    // conditional
+        bool n;    // negate
+        bool p;    // push '('
+} il_str_t;
+
+typedef struct label {
+    char label[512];
+    uint32_t line;
+} label_t;
+
 il_str_t commands[55] = {
 //  STR_CMD, CODE  , C, N, P
   { "LD"   , IL_LD , 0, 0, 0 },

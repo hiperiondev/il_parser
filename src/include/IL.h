@@ -199,26 +199,6 @@ typedef struct parsed_il {
         il_t *result; //
 } parsed_il_t;
 
-typedef struct il_str {
-        char *str; //
-     uint8_t code; //
-        bool c;    // conditional
-        bool n;    // negate
-        bool p;    // push '('
-} il_str_t;
-
-typedef struct label {
-    char label[512];
-    uint32_t line;
-} label_t;
-
-#define ELEMENT_END(v)           \
-            (v).str = NULL;      \
-            (v).c = 0;           \
-            (v).n = 0;           \
-            (v).p = 0;           \
-            (v).code = IL_END;
-
 int compile_il(char *file, parsed_il_t *parsed);
 void free_il(parsed_il_t *il);
 
