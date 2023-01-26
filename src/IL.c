@@ -255,7 +255,7 @@ void compile_il(char *file) {
     char line[512];
     char *ln = NULL, *str_tmp = NULL;
     char *ptr;
-    int index, pc = 0, pos = 0, labels_qty;
+    int index, pc = 0, pos = 0, labels_qty, err;
     label_t *labels;
     char *left = NULL, *right = NULL;
     int lines = 1;
@@ -400,7 +400,9 @@ void compile_il(char *file) {
 
     DBG_PRINT("> parse values\n");
     for (pos = 0; pos < lines; pos++) {
-        parse_value(&(line_parsed[pos]), pos);
+        err = parse_value(&(line_parsed[pos]), pos);
+        if (err != 0)
+            exit(1);
     }
 
     ////////////////////////////////////////

@@ -43,7 +43,7 @@ extern const char phy_prefix_c[];
 extern const char phy_data_type_c[];
 
 void identify_literal(il_t *line, char **value);
-void parse_value(il_t *line, int pos);
+ int parse_value(il_t *line, int pos);
  int parse_phy(il_t *line);
  int parse_time_duration(il_t *line);
  int parse_time_of_day(il_t *line);

@@ -225,7 +225,7 @@ void identify_literal(il_t *line, char **value) {
 	memcpy(*value, ln, strlen(ln));
 }
 
-void parse_value(il_t *line, int pos) {
+int parse_value(il_t *line, int pos) {
     long int value;
     int resultfn;
     switch ((*line).data_format) {
@@ -234,7 +234,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown boolean\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -1;
             }
             (*line).data.uinteger = value;
             break;
@@ -244,7 +244,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown duration\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -2;
             }
             break;
 
@@ -253,7 +253,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
                 printf("----\n\n");
-                exit(1);
+                return -3;
             }
             break;
 
@@ -262,7 +262,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
                 printf("----\n\n");
-                exit(1);
+                return -4;
             }
             break;
 
@@ -271,7 +271,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
                 printf("----\n\n");
-                exit(1);
+                return -5;
             }
             break;
 
@@ -280,16 +280,22 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -6;
             }
             (*line).data.integer = value;
             break;
 
         case LIT_REAL:
+            if(!strisfloat((*line).str))
+                return -7;
+
             (*line).data.real = stod((*line).str);
             break;
 
         case LIT_REAL_EXP:
+            if (!strisrealexp((*line).str))
+                return -8;
+
             (*line).data.real = atof((*line).str);
             (*line).data_format = LIT_REAL;
             break;
@@ -299,7 +305,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 2\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -9;
             }
             (*line).data.uinteger = value;
             (*line).data_format = LIT_INTEGER;
@@ -310,7 +316,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 8\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -10;
             }
             (*line).data.uinteger = value;
             (*line).data_format = LIT_INTEGER;
@@ -321,7 +327,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 16\n", pos);
                 printf("----\n\n");
-                exit(1);
+                return -11;
             }
             (*line).data.uinteger = value;
             (*line).data_format = LIT_INTEGER;
@@ -332,7 +338,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
                 printf("----\n\n");
-                exit(1);
+                return -12;
             }
             break;
 
@@ -342,7 +348,7 @@ void parse_value(il_t *line, int pos) {
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
                 printf("----\n\n");
-                exit(1);
+                return -13;
             }
             break;
 
@@ -354,8 +360,10 @@ void parse_value(il_t *line, int pos) {
         default:
             printf("Line %04d -> error: unknown literal type\n", pos);
             printf("----\n\n");
-            exit(1);
+            return -100;
     }
+
+    return 0;
 }
 
 int parse_phy(il_t *line) {
