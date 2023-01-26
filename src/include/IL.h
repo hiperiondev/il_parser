@@ -47,7 +47,7 @@
 
 extern const char *dataformat_[];
 
-typedef enum IL_COMMANDS {
+enum IL_COMMANDS {
 //   instr  //       | modifiers |  description
     IL_NOP, //  0x00 |           |  Not operation
     IL_LD,  //  0x01 |     N     |  Loads the (negated) the value of the operand into the accumulator.
@@ -81,9 +81,9 @@ typedef enum IL_COMMANDS {
     IL_1D,  //  0x1d |           |  not defined.
     IL_1E,  //  0x1e |           |  not defined.
     IL_END  //  0x1f |           |  Program end.
-} il_commands_t ;
+};
 
-typedef enum DATAFORMAT {
+enum DATAFORMAT {
     LIT_BOOLEAN,       // 0x00
     LIT_DURATION,      // 0x01
     LIT_DATE,          // 0x02
@@ -101,9 +101,9 @@ typedef enum DATAFORMAT {
     LIT_CAL,           // 0x0e
     /* ... */
     LIT_NONE
-} dataformat_t;
+};
 
-typedef enum {
+enum IEC_TYPE {
     IEC_T_NULL    = 0x00, // not value
     IEC_T_BOOL    = 0x01, // bool
     IEC_T_SINT    = 0x02, // int8_t
@@ -136,26 +136,26 @@ typedef enum {
     IEC_T_TIMER   = 0x1d, // timer_t
     IEC_T_VAR     = 0x1e, // variable
     IEC_T_PHY     = 0x1f, // physical address
-} iectype_t;
+};
 
-typedef enum PHY_PREFIX {
+enum PHY_PREFIX {
     PHY_I,   //
     PHY_Q,   //
     PHY_M,   //
     PHY_NONE //
-} phy_prefix_t;
+};
 
-typedef enum PHY_DATA_TYPE {
+enum PHY_DATA_TYPE {
     PHY_BIT,   //
     PHY_BYTE,  //
     PHY_WORD,  //
     PHY_DOUBLE //
-} phy_data_type_t;
+};
 
 typedef struct il_cmd_str il_t;
 struct il_cmd_str {
              char *str;         //
-    il_commands_t code;         // IL code
+          uint8_t code;         // IL code
              bool c;            // conditional
              bool n;            // negate
              bool p;            // push '('
