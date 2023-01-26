@@ -146,17 +146,18 @@ void identify_literal(il_t *line, char **value) {
 		}
 	}
 
-	if ((*line).data_type != 0)
+    if ((*line).data_type == IEC_T_PHY) { // is phy
+        (*line).data_type = 0;
+        (*line).data_format = LIT_PHY;
+        replacestr(ln, "PHY#", "%");
+        goto end;
+    }
+
+    if ((*line).data_type != 0)
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
 
 	if ((*line).data_type == IEC_T_BOOL) { // is bool
 	    (*line).data_format = LIT_BOOLEAN;
-		goto end;
-	}
-
-	if ((*line).data_type == IEC_T_PHY) { // is phy
-	    (*line).data_type = 0;
-		(*line).data_format = LIT_PHY;
 		goto end;
 	}
 
@@ -219,8 +220,7 @@ void identify_literal(il_t *line, char **value) {
 
 	ln = (*line).str;
 
-	end:
-
+end:
 	*value = calloc(strlen(ln) + 1, sizeof(char));
 	memcpy(*value, ln, strlen(ln));
 }
@@ -371,6 +371,9 @@ int parse_phy(il_t *line) {
     char *left, *right;
     long int phy_v;
 
+    char strline[strlen((*line).str) + 1];
+    strcpy(strline, (*line).str);
+
     strremove((*line).str, "%");
 
     (*line).data.phy.prefix = PHY_NONE;
@@ -411,6 +414,7 @@ int parse_phy(il_t *line) {
             return -4;
         (*line).data.phy.phy_b = phy_v;
 
+        strcpy((*line).str, strline);
         return 0;
     }
 
@@ -419,6 +423,7 @@ int parse_phy(il_t *line) {
         return -5;
     (*line).data.phy.phy_a = phy_v;
 
+    strcpy((*line).str, strline);
     return 0;
 }
 
@@ -428,10 +433,15 @@ int parse_time_duration(il_t *line) {
     double integ;
     char *left, *right;
 
+    char strline[strlen((*line).str) + 1];
+
     replacestr((*line).str, "MS", "L ");
     replacestr((*line).str, "S", "S ");
     replacestr((*line).str, "M", "M ");
     replacestr((*line).str, "H", "H ");
+
+    strcpy(strline, (*line).str);
+    replacestr(strline, "L ", "MS");
 
     split2((*line).str, ' ', &left, &right);
     while ((n = strlen(left)) > 0) {
@@ -491,6 +501,7 @@ int parse_time_duration(il_t *line) {
     (*line).data.dt.tod.sec = s;
     (*line).data.dt.tod.msec = ms;
 
+    strcpy((*line).str, strline);
     return 0;
 }
 
@@ -498,6 +509,9 @@ int parse_time_of_day(il_t *line) {
     int h = 0, m = 0, s = 0, ms = 0, err;
     long int res;
     char *right;
+
+    char strline[strlen((*line).str) + 1];
+    strcpy(strline, (*line).str);
 
     if (charOccurrence((*line).str, ':') != 2)
         return -1;
@@ -536,6 +550,7 @@ int parse_time_of_day(il_t *line) {
     (*line).data.dt.tod.sec = s;
     (*line).data.dt.tod.msec = ms;
 
+    strcpy((*line).str, strline);
     return 0;
 }
 
@@ -543,6 +558,9 @@ int parse_calendar_date(il_t *line) {
     int err;
     long int res;
     char *right;
+
+    char strline[strlen((*line).str) + 1];
+    strcpy(strline, (*line).str);
 
     if (charOccurrence((*line).str, '-') != 2)
         return -1;
@@ -566,12 +584,17 @@ int parse_calendar_date(il_t *line) {
         return -4;
     (*line).data.dt.date.day = res;
 
+    strcpy((*line).str, strline);
     return 0;
 }
 
 int parse_date_and_time(il_t *line) {
     int cnt = 0, err;
     char *right;
+
+    char strline[strlen((*line).str) + 1];
+    strcpy(strline, (*line).str);
+
     if (charOccurrence((*line).str, '-') != 3 && charOccurrence((*line).str, ':') != 2)
         return -1;
 
@@ -589,17 +612,20 @@ int parse_date_and_time(il_t *line) {
     if (err != 0)
         return -2;
 
-
     memmove((*line).str, right, strlen(right) + 1);
     err = parse_time_of_day(line);
     if (err != 0)
         return -3;
 
+    strcpy((*line).str, strline);
     return 0;
 }
 
 int parse_cal(il_t *line) {
     char *right;
+
+    char strline[strlen((*line).str) + 1];
+    strcpy(strline, (*line).str);
 
     (*line).data.cal.len = 0;
 
@@ -625,7 +651,8 @@ int parse_cal(il_t *line) {
         memcpy((*line).data.cal.var[(*line).data.cal.len], (*line).str, strlen((*line).str));
 
         split2(right, ',', &((*line).str), &right);
-        (*line).data.cal.value[(*line).data.cal.len].str = (*line).str;
+        (*line).data.cal.value[(*line).data.cal.len].str = calloc(strlen((*line).str) + 1, sizeof(char));
+        strcpy((*line).data.cal.value[(*line).data.cal.len].str, (*line).str);
 
         char *value;
         identify_literal(&((*line).data.cal.value[(*line).data.cal.len]), &value);
@@ -641,5 +668,6 @@ int parse_cal(il_t *line) {
             memmove((*line).str, right, strlen(right) + 1);
     }
 
+    strcpy((*line).str, strline);
     return 0;
 }

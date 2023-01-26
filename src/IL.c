@@ -300,7 +300,6 @@ void compile_il(char *file, il_t **parsed) {
         free(line_parsed[pos].str);
         line_parsed[pos].str = calloc(strlen(value) + 1, sizeof(char));
         memcpy(line_parsed[pos].str, value, strlen(value));
-
         free(value);
     }
 
