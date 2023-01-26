@@ -167,7 +167,7 @@ const char *cmds[] = {
                     if(line_parsed[pos].str != NULL)                                                        \
                         sprintf(temp_string, "%s", line_parsed[pos].str);                                   \
             }                                                                                               \
-            printf("[%04d] %s%s%s%s %s {%s,%s} ",                                                           \
+            printf("  [%04d] %s%s%s%s %s {%s,%s} ",                                                         \
                     pos + 1,                                                                                \
                     cmds[line_parsed[pos].code],                                                            \
                     line_parsed[pos].c ? "C" : "",                                                          \
@@ -235,6 +235,10 @@ const char *cmds[] = {
                       printf("[%zu]\n", line_parsed[pos].data.uinteger);                                    \
                       break;                                                                                \
                 case LIT_CAL:                                                                               \
+				      printf("[func: %s]\n",                                                                \
+				          line_parsed[pos].data.cal.func                                                    \
+				      );                                                                                    \
+                      break;                                                                                \
                 case LIT_STRING:                                                                            \
                 case LIT_VAR:                                                                               \
                       printf("[%s]\n", temp_string);                                                        \
@@ -251,8 +255,7 @@ void compile_il(char *file) {
     char line[512];
     char *ln = NULL, *str_tmp = NULL;
     char *ptr;
-    int index, pc = 0, pos = 0, labels_qty, resultfn;
-    long int value;
+    int index, pc = 0, pos = 0, labels_qty;
     label_t *labels;
     char *left = NULL, *right = NULL;
     int lines = 1;
@@ -289,7 +292,11 @@ void compile_il(char *file) {
 
         labels = realloc(labels, (pos + 1) * sizeof(label_t));
     }
+
+    if (labels_qty == 0)
+        DBG_PRINT("[none]\n");
     DBG_PRINT("\n");
+
     rewind(f);
     pc = 0;
 
@@ -393,134 +400,7 @@ void compile_il(char *file) {
 
     DBG_PRINT("> parse values\n");
     for (pos = 0; pos < lines; pos++) {
-        switch (line_parsed[pos].data_format) {
-            case LIT_BOOLEAN:
-                resultfn = str2int(&value, line_parsed[pos].str, 2);
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown boolean\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                line_parsed[pos].data.uinteger = value;
-                break;
-
-            case LIT_DURATION:
-                resultfn = parse_time_duration(&(line_parsed[pos]));
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown duration\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_DATE:
-                resultfn = parse_calendar_date(&(line_parsed[pos]));
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_TIME_OF_DAY:
-                resultfn = parse_time_of_day(&(line_parsed[pos]));
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_DATE_AND_TIME:
-                resultfn = parse_date_and_time(&(line_parsed[pos]));
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_INTEGER:
-                resultfn = str2int(&value, line_parsed[pos].str, 10);
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown integer\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                line_parsed[pos].data.integer = value;
-                break;
-
-            case LIT_REAL:
-                line_parsed[pos].data.real = stod(line_parsed[pos].str);
-                break;
-
-            case LIT_REAL_EXP:
-                line_parsed[pos].data.real = atof(line_parsed[pos].str);
-                line_parsed[pos].data_format = LIT_REAL;
-                break;
-
-            case LIT_BASE2:
-                resultfn = str2int(&value, line_parsed[pos].str, 2);
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown integer base 2\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                line_parsed[pos].data.uinteger = value;
-                line_parsed[pos].data_format = LIT_INTEGER;
-                break;
-
-            case LIT_BASE8:
-                resultfn = str2int(&value, line_parsed[pos].str, 8);
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown integer base 8\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                line_parsed[pos].data.uinteger = value;
-                line_parsed[pos].data_format = LIT_INTEGER;
-                break;
-
-            case LIT_BASE16:
-                resultfn = str2int(&value, line_parsed[pos].str, 16);
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown integer base 16\n", pos);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                line_parsed[pos].data.uinteger = value;
-                line_parsed[pos].data_format = LIT_INTEGER;
-                break;
-
-            case LIT_PHY:
-                resultfn = parse_phy(&(line_parsed[pos]));
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_CAL:
-                resultfn = parse_cal(&(line_parsed[pos]));
-
-                if (resultfn != 0) {
-                    DBG_PRINT("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
-                    DBG_PRINT("----\n\n");
-                    exit(1);
-                }
-                break;
-
-            case LIT_STRING:
-            case LIT_NONE:
-            case LIT_VAR:
-                break;
-
-            default:
-                DBG_PRINT("Line %04d -> error: unknown literal type\n", pos);
-                DBG_PRINT("----\n\n");
-                exit(1);
-        }
+        parse_value(&(line_parsed[pos]), pos);
     }
 
     ////////////////////////////////////////

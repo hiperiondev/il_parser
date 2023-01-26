@@ -59,7 +59,7 @@ typedef enum {
    int stringOccurrence(char*, char*);
 
 char** split(char*, char);
-  void split2(char *str, char delimiter, char **left, char **right);
+   int split2(char *str, char delimiter, char **left, char **right);
 char** splits(char*, char*);
 
  char* lowerCase(char*);

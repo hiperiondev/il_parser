@@ -333,18 +333,26 @@ char** split(char *str, char c) {
     return parts;
 }
 
-void split2(char *str, char delimiter, char **left, char **right) {
+int split2(char *str, char delimiter, char **left, char **right) {
     int pos = 0;
-    *right = NULL;
+
+    if(charOccurrence(str, delimiter) == 0) {
+        *left = str;
+        *right = NULL;
+        return -1;
+    }
 
     while (str[pos] != delimiter && str[pos] != '\0')
         ++pos;
+
     if (pos == strlen(str) + 1)
-        return;
+        return -2;
 
     *left = str;
     (*left)[pos] = '\0';
     *right = str + pos + 1;
+
+    return 0;
 }
 
 /**
@@ -490,7 +498,6 @@ int replacestr(char *line, const char *search, const char *replace) {
 	int count;
 	char *sp; // start of pattern
 
-	//printf("replacestr(%s, %s, %s)\n", line, search, replace);
 	if ((sp = strstr(line, search)) == NULL) {
 		return (0);
 	}

@@ -225,6 +225,139 @@ void identify_literal(il_t *line, char **value) {
 	memcpy(*value, ln, strlen(ln));
 }
 
+void parse_value(il_t *line, int pos) {
+    long int value;
+    int resultfn;
+    switch ((*line).data_format) {
+        case LIT_BOOLEAN:
+            resultfn = str2int(&value, (*line).str, 2);
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown boolean\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            (*line).data.uinteger = value;
+            break;
+
+        case LIT_DURATION:
+            resultfn = parse_time_duration(&((*line)));
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown duration\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_DATE:
+            resultfn = parse_calendar_date(&((*line)));
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_TIME_OF_DAY:
+            resultfn = parse_time_of_day(&((*line)));
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_DATE_AND_TIME:
+            resultfn = parse_date_and_time(&((*line)));
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_INTEGER:
+            resultfn = str2int(&value, (*line).str, 10);
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown integer\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            (*line).data.integer = value;
+            break;
+
+        case LIT_REAL:
+            (*line).data.real = stod((*line).str);
+            break;
+
+        case LIT_REAL_EXP:
+            (*line).data.real = atof((*line).str);
+            (*line).data_format = LIT_REAL;
+            break;
+
+        case LIT_BASE2:
+            resultfn = str2int(&value, (*line).str, 2);
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown integer base 2\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            (*line).data.uinteger = value;
+            (*line).data_format = LIT_INTEGER;
+            break;
+
+        case LIT_BASE8:
+            resultfn = str2int(&value, (*line).str, 8);
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown integer base 8\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            (*line).data.uinteger = value;
+            (*line).data_format = LIT_INTEGER;
+            break;
+
+        case LIT_BASE16:
+            resultfn = str2int(&value, (*line).str, 16);
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown integer base 16\n", pos);
+                printf("----\n\n");
+                exit(1);
+            }
+            (*line).data.uinteger = value;
+            (*line).data_format = LIT_INTEGER;
+            break;
+
+        case LIT_PHY:
+            resultfn = parse_phy(&((*line)));
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_CAL:
+            resultfn = parse_cal(&((*line)));
+
+            if (resultfn != 0) {
+                printf("Line %04d -> error: unknown function call format (%d)\n", pos, resultfn);
+                printf("----\n\n");
+                exit(1);
+            }
+            break;
+
+        case LIT_STRING:
+        case LIT_NONE:
+        case LIT_VAR:
+            break;
+
+        default:
+            printf("Line %04d -> error: unknown literal type\n", pos);
+            printf("----\n\n");
+            exit(1);
+    }
+}
+
 int parse_phy(il_t *line) {
     int n, t = 1;
     char *left, *right;
@@ -456,8 +589,40 @@ int parse_date_and_time(il_t *line) {
 }
 
 int parse_cal(il_t *line) {
-    //int cnt = 0, err;
-    //char *right;
+    char *right;
+
+    (*line).data.cal.len = 0;
+
+    split2((*line).str, ' ', &((*line).str), &right);
+    (*line).data.cal.func = calloc(strlen((*line).str) + 1, sizeof(char));
+    memcpy((*line).data.cal.func, (*line).str, strlen((*line).str));
+
+    if (!(right[0] == '(' && right[strlen(right + 1)] == ')')) {
+        return 0;
+    }
+    right[strlen(right + 1)] = '\0';
+    memmove((*line).str, right + 1, strlen(right));
+
+    strremove((*line).str, " ");
+    replacestr((*line).str, ":=", "=");
+    printf("str: %s\n", (*line).str);
+
+    (*line).data.cal.value = malloc(sizeof(il_t));
+    (*line).data.cal.var = malloc(sizeof(char*));
+
+    while (right != NULL) {
+        split2((*line).str, '=', &((*line).str), &right);
+        (*line).data.cal.var[(*line).data.cal.len] = calloc(strlen((*line).str) + 1, sizeof(char));
+        memcpy((*line).data.cal.var[(*line).data.cal.len], (*line).str, strlen((*line).str));
+
+        split2(right, ',', &((*line).str), &right);
+        printf("left:%s, right [%s]\n", (*line).str, right);
+
+        ++(*line).data.cal.len;
+        if (right != NULL)
+            memmove((*line).str, right, strlen(right) + 1);
+    }
+
     printf("CAL: %s\n", (*line).str);
 
     return 0;
