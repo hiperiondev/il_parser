@@ -208,9 +208,6 @@ typedef struct label {
     uint32_t line;
 } label_t;
 
-extern il_str_t commands[55];
-extern const char *cmds[];
-
 #define ELEMENT_END(v)           \
             (v).str = NULL;      \
             (v).c = 0;           \

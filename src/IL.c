@@ -39,25 +39,6 @@
 #include "strings.h"
 #include "parser.h"
 
-const char *dataformat_[] = {
-    "LIT_BOOLEAN",       // 0x00
-    "LIT_DURATION",      // 0x01
-    "LIT_DATE",          // 0x02
-    "LIT_TIME_OF_DAY",   // 0x03
-    "LIT_DATE_AND_TIME", // 0x04
-    "LIT_INTEGER",       // 0x05
-    "LIT_REAL",          // 0x06
-    "LIT_REAL_EXP",      // 0x07
-    "LIT_BASE2",         // 0x08
-    "LIT_BASE8",         // 0x09
-    "LIT_BASE16",        // 0x0a
-    "LIT_PHY",           // 0x0c
-    "LIT_STRING",        // 0x0d
-    "LIT_VAR",           // 0x0e
-    "LIT_CAL",           // 0x0f
-    "LIT_NONE"           //
-};
-
 il_str_t commands[55] = {
 //  STR_CMD, CODE  , C, N, P
   { "LD"   , IL_LD , 0, 0, 0 },
@@ -115,41 +96,6 @@ il_str_t commands[55] = {
   { "RETCN", IL_RET, 1, 1, 0 },
   { "RETNC", IL_RET, 1, 1, 0 },
   { ")"    , IL_POP, 0, 0, 0 },
-};
-
-const char *cmds[] = {
-        "NOP", //
-        "LD",  //
-        "ST",  //
-        "S",   //
-        "R",   //
-        "AND", //
-        "OR",  //
-        "XOR", //
-        "NOT", //
-        "ADD", //
-        "SUB", //
-        "MUL", //
-        "DIV", //
-        "GT",  //
-        "GE",  //
-        "EQ",  //
-        "NE",  //
-        "LE",  //
-        "LT",  //
-        "JMP", //
-        "CAL", //
-        "RET", //
-        "POP", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "END", //
 };
 
 //////////////////////////////////
@@ -277,7 +223,6 @@ void compile_il(char *file, il_t **parsed) {
     }
 
     // third pass: evaluate arguments
-
     DBG_PRINT("\n> identify literals\n");
     for (pos = 0; pos < lines; pos++) {
         datatype = IEC_T_NULL;

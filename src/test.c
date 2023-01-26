@@ -38,6 +38,62 @@
 #include "IL.h"
 #include "parser.h"
 
+const char *dataformat_[] = {
+    "LIT_BOOLEAN",       // 0x00
+    "LIT_DURATION",      // 0x01
+    "LIT_DATE",          // 0x02
+    "LIT_TIME_OF_DAY",   // 0x03
+    "LIT_DATE_AND_TIME", // 0x04
+    "LIT_INTEGER",       // 0x05
+    "LIT_REAL",          // 0x06
+    "LIT_REAL_EXP",      // 0x07
+    "LIT_BASE2",         // 0x08
+    "LIT_BASE8",         // 0x09
+    "LIT_BASE16",        // 0x0a
+    "LIT_PHY",           // 0x0c
+    "LIT_STRING",        // 0x0d
+    "LIT_VAR",           // 0x0e
+    "LIT_CAL",           // 0x0f
+    "LIT_NONE"           //
+};
+
+const char *cmds[] = {
+        "NOP", //
+        "LD",  //
+        "ST",  //
+        "S",   //
+        "R",   //
+        "AND", //
+        "OR",  //
+        "XOR", //
+        "NOT", //
+        "ADD", //
+        "SUB", //
+        "MUL", //
+        "DIV", //
+        "GT",  //
+        "GE",  //
+        "EQ",  //
+        "NE",  //
+        "LE",  //
+        "LT",  //
+        "JMP", //
+        "CAL", //
+        "RET", //
+        "POP", //
+        "???", //
+        "???", //
+        "???", //
+        "???", //
+        "???", //
+        "???", //
+        "???", //
+        "???", //
+        "END", //
+};
+
+/////////////
+
 #define PRINT_PARSED_LINE(line)                                                         \
             char addr[2048], temp_string[2048]="";                                      \
             sprintf(addr, "%u", line.data.jmp_addr);                                    \
@@ -211,17 +267,17 @@ int main(void) {
     il_t *parsed = NULL;
     int pos;
 
+    printf("--------------------------------------------\n< START test1 >\n\n");
     compile_il("test.il", &parsed);
-    ////////////////////////////////////////
 
     printf("\n----------\n- RESULT -\n----------\n");
 
     for (pos = 0; pos < parsed->lines; pos++) {
         PRINT_PARSED_LINE(parsed[pos]);
     }
+    printf("\n< END test1 >\n--------------------------------------------\n\n");
 
-    printf("\n//////////////////////////////////////\n\n");
-
+    printf("\n\n--------------------------------------------\n< START test2 >\n\n");
     compile_il("test2.il", &parsed);
 
     printf("\n----------\n- RESULT -\n----------\n");
@@ -229,6 +285,7 @@ int main(void) {
     for (pos = 0; pos < parsed->lines; pos++) {
         PRINT_PARSED_LINE(parsed[pos]);
     }
+    printf("\n< END test2 >\n--------------------------------------------\n\n");
 
     return EXIT_SUCCESS;
 }
