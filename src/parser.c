@@ -371,6 +371,8 @@ int parse_phy(il_t *line) {
     char *left, *right;
     long int phy_v;
 
+    strremove((*line).str, "%");
+
     (*line).data.phy.prefix = PHY_NONE;
     for (n = 0; n <= PHY_M; n++) {
         if ((*line).str[0] == phy_prefix_c[n]) {
@@ -380,7 +382,7 @@ int parse_phy(il_t *line) {
 
     }
     if ((*line).data.phy.prefix == PHY_NONE)
-        return -2;
+        return -1;
 
     (*line).data_type = PHY_BIT;
     for (n = 0; n <= PHY_DOUBLE; n++) {
@@ -395,18 +397,18 @@ int parse_phy(il_t *line) {
 
     if ((*line).data_type == PHY_BIT) {
         if (!strisfloat((*line).str))
-            return -3;
+            return -2;
 
         split2((*line).str, '.', &left, &right);
 
         n = str2int(&phy_v, left, 10);
         if (n != STR2INT_SUCCESS || phy_v < 0)
-            return -4;
+            return -3;
         (*line).data.phy.phy_a = phy_v;
 
         n = str2int(&phy_v, right, 10);
         if (n != STR2INT_SUCCESS || phy_v < 0)
-            return -5;
+            return -4;
         (*line).data.phy.phy_b = phy_v;
 
         return 0;
@@ -414,7 +416,7 @@ int parse_phy(il_t *line) {
 
     n = str2int(&phy_v, (*line).str, 10);
     if (n != STR2INT_SUCCESS || phy_v < 0)
-        return -6;
+        return -5;
     (*line).data.phy.phy_a = phy_v;
 
     return 0;
@@ -624,9 +626,18 @@ int parse_cal(il_t *line) {
         memcpy((*line).data.cal.var[(*line).data.cal.len], (*line).str, strlen((*line).str));
 
         split2(right, ',', &((*line).str), &right);
-        printf("left:%s, right [%s]\n", (*line).str, right);
+        (*line).data.cal.value[(*line).data.cal.len].str = (*line).str;
+
+        char *value;
+        identify_literal(&((*line).data.cal.value[(*line).data.cal.len]), &value);
+        int err = parse_value(&((*line).data.cal.value[(*line).data.cal.len]), 0);
+        if (err != 0)
+            exit(1);
 
         ++(*line).data.cal.len;
+        (*line).data.cal.value = realloc((*line).data.cal.value, ((*line).data.cal.len + 1) * sizeof(il_t));
+        (*line).data.cal.var = realloc((*line).data.cal.var, ((*line).data.cal.len + 1) * sizeof(char*));
+
         if (right != NULL)
             memmove((*line).str, right, strlen(right) + 1);
     }
