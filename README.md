@@ -87,7 +87,7 @@ labels:
 
 program:
   [0001] LD %i0.0
-  [0002] ST %m0.0
+  [0002] ST %mb0
   [0003] EQ %m3.0
   [0004] JMPC end
   [0005] LDN bool#true
@@ -128,7 +128,7 @@ program:
 - RESULT (35)-
 ----------
   [0001] LD %IX0.0 (type: NULL#, format: LIT_PHY, value: I, X, 0, 0)
-  [0002] ST %MX0.0 (type: NULL#, format: LIT_PHY, value: M, X, 0, 0)
+  [0002] ST %MB0 (type: NULL#, format: LIT_PHY, value: M, B, 0, 0)
   [0003] EQ %MX3.0 (type: NULL#, format: LIT_PHY, value: M, X, 3, 0)
   [0004] JMPC 25 (type: NULL#, format: LIT_NONE, value: [null])
   [0005] LDN 1 (type: BOOL#, format: LIT_BOOLEAN, value: 1)
@@ -150,7 +150,7 @@ program:
   [0021] ST %MX1.0 (type: NULL#, format: LIT_PHY, value: M, X, 1, 0)
   [0022] JMP 9 (type: NULL#, format: LIT_NONE, value: [null])
   [0023] LD a_Variable_23 (type: NULL#, format: LIT_VAR, value: a_Variable_23)
-  [0024] ST %QX5.0 (type: SINT#, format: LIT_PHY, value: Q, X, 5, 0)
+  [0024] ST %QW5 (type: NULL#, format: LIT_PHY, value: Q, W, 5, 0)
   [0025] ST %QX0.0 (type: NULL#, format: LIT_PHY, value: Q, X, 0, 0)
   [0026] LD 11:36:15.20 (type: TOD#, format: LIT_TIME_OF_DAY, value: 11, 36, 15, 20)
   [0027] LD 1H 15M 30S 60MS (type: NULL#, format: LIT_DURATION, value: 1, 15, 30, 60)
