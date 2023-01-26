@@ -1,5 +1,5 @@
           LD %i0.0
-          ST %m0.0
+          ST %mb0
           EQ %m3.0
           JMPC end
           LDN bool#true

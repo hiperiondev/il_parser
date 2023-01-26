@@ -869,6 +869,9 @@ bool strisrealexp(char *str) {
  *
  */
 str2int_errno str2int(long int *out, char *s, int base) {
+    if(s == NULL)
+        return STR2INT_INCONVERTIBLE;
+
     char *end;
     if (s[0] == '\0' || isspace(s[0]))
         return STR2INT_INCONVERTIBLE;

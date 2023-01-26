@@ -99,12 +99,20 @@ const char *cmds[] = {
             sprintf(addr, "%u", line.data.jmp_addr);                                    \
             if(line.code != IL_JMP) {                                                   \
                 if (line.data_format == LIT_PHY)                                        \
-                    sprintf(temp_string, "%%%c%c%u.%u",                                 \
-                        phy_prefix_c[line.data.phy.prefix],                             \
-                        phy_data_type_c[line.data.phy.datatype],                        \
-                        line.data.phy.phy_a,                                            \
-                        line.data.phy.phy_b                                             \
-                     );                                                                 \
+                    if(line.data.phy.datatype == PHY_BIT) {                             \
+                        sprintf(temp_string, "%%%c%c%u.%u",                             \
+                            phy_prefix_c[line.data.phy.prefix],                         \
+                            phy_data_type_c[line.data.phy.datatype],                    \
+                            line.data.phy.phy_a,                                        \
+                            line.data.phy.phy_b                                         \
+                        );                                                              \
+                    } else {                                                            \
+                    	sprintf(temp_string, "%%%c%c%u",                                \
+                    	    phy_prefix_c[line.data.phy.prefix],                         \
+                    	    phy_data_type_c[line.data.phy.datatype],                    \
+                    	    line.data.phy.phy_a                                         \
+                    	);                                                              \
+                    }                                                                   \
                 else                                                                    \
                     if(line.str != NULL)                                                \
                         sprintf(temp_string, "%s", line.str);                           \

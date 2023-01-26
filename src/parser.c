@@ -390,7 +390,7 @@ int parse_phy(il_t *line) {
     (*line).data_type = PHY_BIT;
     for (n = 0; n <= PHY_DOUBLE; n++) {
         if ((*line).str[1] == phy_data_type_c[n]) {
-            (*line).data_type = n;
+            (*line).data.phy.datatype = n;
             t++;
             break;
         }
@@ -398,7 +398,7 @@ int parse_phy(il_t *line) {
 
     memmove((*line).str, (*line).str + t, strlen((*line).str) - t + 1);
 
-    if ((*line).data_type == PHY_BIT) {
+    if ((*line).data.phy.datatype == PHY_BIT) {
         if (!strisfloat((*line).str))
             return -2;
 
