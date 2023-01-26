@@ -67,7 +67,7 @@ const uint8_t IEC_LITERAL_FORMAT[]= {
 };
 
 const char *IEC_IECTYPE_PFX[] = {
-    "?#",       // 0
+    "NULL#",    // 0
     "BOOL#",    //
     "SINT#",    //
     "USINT#",   //
