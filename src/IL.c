@@ -167,7 +167,7 @@ const char *cmds[] = {
                     if(line.str != NULL)                                               \
                         sprintf(temp_string, "%s", line.str);                          \
             }                                                                          \
-            printf("  [%04d] %s%s%s%s %s (type: %s, format: %s) ",                     \
+            printf("  [%04d] %s%s%s%s %s (type: %s, format: %s, value: ",              \
                     pos + 1,                                                           \
                     cmds[line.code],                                                   \
                     line.c ? "C" : "",                                                 \
@@ -178,7 +178,7 @@ const char *cmds[] = {
             );                                                                         \
             switch(line.data_format) {                                                 \
                 case LIT_PHY:                                                          \
-                      printf("[%c, %c, %d, %d]    \n",                                 \
+                      printf("%c, %c, %d, %d)\n",                                      \
                           phy_prefix_c[line.data.phy.prefix],                          \
                           phy_data_type_c[line.data.phy.datatype],                     \
                           line.data.phy.phy_a,                                         \
@@ -186,7 +186,7 @@ const char *cmds[] = {
                       );                                                               \
                       break;                                                           \
                 case LIT_DURATION:                                                     \
-                      printf("[%d, %d, %d, %d]    \n",                                 \
+                      printf("%d, %d, %d, %d)\n",                                      \
                           line.data.dt.tod.hour,                                       \
                           line.data.dt.tod.min,                                        \
                           line.data.dt.tod.sec,                                        \
@@ -194,14 +194,14 @@ const char *cmds[] = {
                       );                                                               \
                       break;                                                           \
                 case LIT_DATE:                                                         \
-                      printf("[%d, %d, %d]    \n",                                     \
+                      printf("%d, %d, %d)\n",                                          \
                           line.data.dt.date.year,                                      \
                           line.data.dt.date.month,                                     \
                           line.data.dt.date.day                                        \
                       );                                                               \
                       break;                                                           \
                 case LIT_TIME_OF_DAY:                                                  \
-                      printf("[%d, %d, %d, %d]    \n",                                 \
+                      printf("%d, %d, %d, %d)\n",                                      \
                           line.data.dt.tod.hour,                                       \
                           line.data.dt.tod.min,                                        \
                           line.data.dt.tod.sec,                                        \
@@ -209,7 +209,7 @@ const char *cmds[] = {
                       );                                                               \
                       break;                                                           \
                 case LIT_DATE_AND_TIME:                                                \
-                      printf("[%d, %d, %d, %d, %d, %d, %d]    \n",                     \
+                      printf("%d, %d, %d, %d, %d, %d, %d)\n",                          \
                           line.data.dt.date.year,                                      \
                           line.data.dt.date.month,                                     \
                           line.data.dt.date.day,                                       \
@@ -220,22 +220,22 @@ const char *cmds[] = {
                       );                                                               \
                       break;                                                           \
                 case LIT_INTEGER:                                                      \
-                      printf("[%ld]    \n",                                            \
+                      printf("%ld)\n",                                                 \
                           line.data.integer                                            \
                       );                                                               \
                       break;                                                           \
                 case LIT_REAL:                                                         \
                 case LIT_REAL_EXP:                                                     \
-                      printf("[%f]    \n", line.data.real);                            \
+                      printf("%f)\n", line.data.real);                                 \
                       break;                                                           \
                 case LIT_BOOLEAN:                                                      \
                 case LIT_BASE2:                                                        \
                 case LIT_BASE8:                                                        \
                 case LIT_BASE16:                                                       \
-                      printf("[%zu]    \n", line.data.uinteger);                       \
+                      printf("%zu)\n", line.data.uinteger);                            \
                       break;                                                           \
                 case LIT_CAL:                                                          \
-				      printf("[func: %s]    \n", line.data.cal.func);                  \
+				      printf("func: %s)\n", line.data.cal.func);                       \
 				      for(int n = 0; n<line.data.cal.len; n++) {                       \
 				    	  printf("            [var: %s type: %s, format: %s value: ",  \
                               line.data.cal.var[n],                                    \
@@ -248,10 +248,10 @@ const char *cmds[] = {
                       break;                                                           \
                 case LIT_STRING:                                                       \
                 case LIT_VAR:                                                          \
-                      printf("[%s]    \n", temp_string);                               \
+                      printf("%s)\n", temp_string);                                    \
                       break;                                                           \
                  default:                                                              \
-                      printf("    \n");                                                \
+                      printf("[null])\n");                                             \
              }
 
 #define PRINT_VALUE(line)                                          \
