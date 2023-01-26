@@ -45,6 +45,8 @@
     #define DBG_PRINT(fmt, args...)
 #endif
 
+extern const char *dataformat_[];
+
 typedef enum IL_COMMANDS {
 //   instr  //       | modifiers |  description
     IL_NOP, //  0x00 |           |  Not operation
@@ -159,6 +161,7 @@ struct il_cmd_str {
              bool p;            // push '('
           uint8_t data_type;    //
           uint8_t data_format;  //
+              int lines;        //
     union {
           double real;          //
         uint32_t jmp_addr;      //
@@ -215,6 +218,6 @@ extern const char *cmds[];
             (v).p = 0;           \
             (v).code = IL_END;
 
-void compile_il(char *file);
+void compile_il(char *file, il_t **parsed);
 
 #endif /* IL_H_ */
