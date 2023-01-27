@@ -354,6 +354,9 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_STRING:
+            strremove((*line).str, "\"");
+            break;
+
         case LIT_NONE:
         case LIT_VAR:
             break;
