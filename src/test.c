@@ -35,8 +35,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "IL.h"
-#include "parser.h"
+#include "il_parser.h"
+#include "internal_parser.h"
 
 const char *dataformat_[] = {
     "LIT_BOOLEAN",       // 0x00

@@ -1,5 +1,5 @@
 /**
- * @file parser.c
+ * @file internal_parser.c
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
@@ -35,8 +35,8 @@
 #include <limits.h>
 #include <math.h>
 
-#include "IL.h"
-#include "parser.h"
+#include "il_parser.h"
+#include "internal_parser.h"
 #include "strings.h"
 
 const char *IEC_DATAFORMAT_PFX[] = {
@@ -176,6 +176,7 @@ void identify_literal(il_t *line, char **value) {
 	    ln = (*line).str;
 	    goto end;
 	}
+
 	// search data prefix
 	uint8_t dformat = LIT_NONE;
 	for (n = 0; n < 9; n++) {

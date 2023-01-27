@@ -1,5 +1,5 @@
 /**
- * @file il.h
+ * @file il_parser.h
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
@@ -34,7 +34,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "parser.h"
+#include "internal_parser.h"
 
 #define DEBUG
 
@@ -44,8 +44,6 @@
 #else
     #define DBG_PRINT(fmt, args...)
 #endif
-
-extern const char *dataformat_[];
 
 enum IL_COMMANDS {
 //   instr  //       | modifiers |  description
@@ -152,8 +150,8 @@ enum PHY_DATA_TYPE {
     PHY_DOUBLE //
 };
 
-typedef struct il_cmd_str il_t;
-struct il_cmd_str {
+typedef struct il il_t;
+struct il {
              char *str;         //
           uint8_t code;         // IL code
              bool c;            // conditional
@@ -185,17 +183,17 @@ struct il_cmd_str {
                 uint16_t year;  //
             } date;             //
             struct {
-                uint8_t msec;   //
-                uint8_t sec;    //
-                uint8_t min;    //
-                uint8_t hour;   //
+                 uint8_t msec;  //
+                 uint8_t sec;   //
+                 uint8_t min;   //
+                 uint8_t hour;  //
             } tod;              //
         } dt;                   //
     } data;                     //
 };
 
-typedef struct parsed_il {
-        int lines;    //
+typedef struct {
+         int lines;   //
         il_t *result; //
 } parsed_il_t;
 

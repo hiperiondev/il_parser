@@ -1,5 +1,5 @@
 /**
- * @file il.c
+ * @file il_parser.c
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
@@ -35,9 +35,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "IL.h"
+#include "il_parser.h"
 #include "strings.h"
-#include "parser.h"
+#include "internal_parser.h"
 
 #define ELEMENT_END(v)         \
             (v).str = NULL;    \

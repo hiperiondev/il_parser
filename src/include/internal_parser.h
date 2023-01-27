@@ -1,5 +1,5 @@
 /**
- * @file parser.h
+ * @file internal_parser.h
  * @brief
  * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
@@ -33,8 +33,8 @@
 
 #include <stdint.h>
 
-#include "IL.h"
-typedef struct il_cmd_str il_t;
+#include "il_parser.h"
+typedef struct il il_t;
 
 extern const char *IEC_DATAFORMAT_PFX[];
 extern const uint8_t IEC_LITERAL_FORMAT[];
