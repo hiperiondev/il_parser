@@ -276,6 +276,7 @@ int compile_il(char *file, parsed_il_t *parsed) {
             exit(1);
     }
 
+    line_parsed[lines - 1].str = calloc(1, sizeof(char));
     parsed->result = line_parsed;
     parsed->lines = lines;
     return lines;
