@@ -57,7 +57,7 @@ const char *lit_dataformat_str[] = {
     "LIT_NONE"           //
 };
 
-const char *cmds[] = {
+const char *il_commands_str[] = {
         "NOP", //
         "LD",  //
         "ST",  //
@@ -119,7 +119,7 @@ const char *cmds[] = {
             }                                                                           \
             printf("  [%04d] %s%s%s%s %s (type: %s, format: %s, value: ",               \
                     pos + 1,                                                            \
-                    cmds[line.code],                                                    \
+					il_commands_str[line.code],                                         \
                     line.c ? "C" : "",                                                  \
                     line.n ? "N" : "",                                                  \
                     line.p ? "(" : "",                                                  \
