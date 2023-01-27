@@ -124,9 +124,6 @@ program:
 
 > identify literals
 > parse values
-LIT_DURATION: 1H15M30S60MS
-LIT_DURATION: 1H15M30S60MS
-LIT_DURATION: 18MS
 
 ----------
 - RESULT (36)-
