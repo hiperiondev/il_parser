@@ -263,7 +263,6 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_DURATION:
-            printf("LIT_DURATION: %s\n", (*line).str);
             resultfn = parse_time_duration(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown duration\n", pos);
@@ -652,7 +651,8 @@ int parse_cal(il_t *line) {
     char *right;
 
     char strline[strlen((*line).str) + 1];
-    strcpy(strline, (*line).str);
+    //strcpy_s(strline, (*line).str, strlen((*line).str));
+    snprintf(strline, strlen((*line).str), "%s", (*line).str);
 
     (*line).data.cal.len = 0;
 
