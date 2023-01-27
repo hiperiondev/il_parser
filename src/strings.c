@@ -103,10 +103,11 @@ char* substr(char *str, int start) {
     if (start >= len || start < 0)
         return NULL;
 
-    char *res_s = (char*) malloc(sizeof(char) * (len - start + 1));
+    char *res_s = (char*) malloc(sizeof(char) * (len - start + 10));
 
-    for (int i = start; i < len; i++)
+    for (int i = start; i < len; i++) {
         res_s[i - start] = str[i];
+    }
     res_s[len - start] = '\0';
 
     return res_s;

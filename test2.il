@@ -25,6 +25,7 @@ endwhile: LD a_Variable_23
 end:      ST %q0.0
           LD TIME_OF_DAY#11:36:15.20
           LD TIME#1h_15m_30s_60ms
+          CAL CTU_1 (var1:=%IW5, PV:=Limit, CU:=-12e6, STR:='str')
           LD TIME#18ms
           LD DATE#2001-04-09
           LD DATE_AND_TIME#2001-04-09-11:36:15.20

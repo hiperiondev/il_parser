@@ -194,6 +194,7 @@ int compile_il(char *file, parsed_il_t *parsed) {
             line[index] = '\0';
         }
 
+        replace(line, 0x27, 0x22);
         ln = trim(line);
         DBG_PRINT("  [%04d] %s\n", pc, ln);
 
