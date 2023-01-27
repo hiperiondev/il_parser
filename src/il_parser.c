@@ -46,7 +46,7 @@
             (v).p = 0;         \
             (v).code = IL_END;
 
-typedef struct il_str {
+typedef struct {
         char *str; //
      uint8_t code; //
         bool c;    // conditional
@@ -54,9 +54,9 @@ typedef struct il_str {
         bool p;    // push '('
 } il_str_t;
 
-typedef struct label {
-    char label[512];
-    uint32_t line;
+typedef struct {
+    char label[512]; //
+    uint32_t line;   //
 } label_t;
 
 il_str_t commands[55] = {

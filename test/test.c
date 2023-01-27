@@ -38,7 +38,7 @@
 #include "il_parser.h"
 #include "internal_parser.h"
 
-const char *dataformat_[] = {
+const char *lit_dataformat_str[] = {
     "LIT_BOOLEAN",       // 0x00
     "LIT_DURATION",      // 0x01
     "LIT_DATE",          // 0x02
@@ -124,7 +124,7 @@ const char *cmds[] = {
                     line.n ? "N" : "",                                                  \
                     line.p ? "(" : "",                                                  \
                     line.code == IL_JMP ? addr : temp_string,                           \
-                    IEC_IECTYPE_PFX[line.data_type], dataformat_[line.data_format]      \
+                    pfx_iectype[line.data_type], lit_dataformat_str[line.data_format]   \
             );                                                                          \
             switch(line.data_format) {                                                  \
                 case LIT_PHY:                                                           \
@@ -190,8 +190,8 @@ const char *cmds[] = {
                       for(int n = 0; n<line.data.cal.len; n++) {                        \
                           printf("             [var: %s type: %s, format: %s, value: ", \
                               line.data.cal.var[n],                                     \
-                              IEC_IECTYPE_PFX[line.data.cal.value[n].data_type],        \
-                              dataformat_[line.data.cal.value[n].data_format]           \
+							  pfx_iectype[line.data.cal.value[n].data_type],            \
+							  lit_dataformat_str[line.data.cal.value[n].data_format]    \
                           );                                                            \
                           PRINT_VALUE(line.data.cal.value[n]);                          \
                           printf("]    \n");                                            \

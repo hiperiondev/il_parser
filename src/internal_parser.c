@@ -39,7 +39,7 @@
 #include "internal_parser.h"
 #include "strings.h"
 
-const char *IEC_DATAFORMAT_PFX[] = {
+const char *pfx_dataformat[] = {
     "2#",            // 0
     "8#",            //
     "16#",           //
@@ -52,7 +52,7 @@ const char *IEC_DATAFORMAT_PFX[] = {
 	"PHY#"           // 9
 };
 
-const uint8_t IEC_LITERAL_FORMAT[]= {
+const uint8_t literal_format[]= {
     LIT_BASE2,
     LIT_BASE8,
     LIT_BASE16,
@@ -66,7 +66,7 @@ const uint8_t IEC_LITERAL_FORMAT[]= {
 	LIT_VAR
 };
 
-const char *IEC_IECTYPE_PFX[] = {
+const char *pfx_iectype[] = {
     "NULL#",    // 0
     "BOOL#",    //
     "SINT#",    //
@@ -140,7 +140,7 @@ void identify_literal(il_t *line, char **value) {
 	// search typed literal
 	(*line).data_type = 0;
 	for (n = 1; n < 32; n++) {
-		if (strstr(ln, IEC_IECTYPE_PFX[n]) == ln) {
+		if (strstr(ln, pfx_iectype[n]) == ln) {
 		    (*line).data_type = n;
 			break;
 		}
@@ -180,7 +180,7 @@ void identify_literal(il_t *line, char **value) {
 	// search data prefix
 	uint8_t dformat = LIT_NONE;
 	for (n = 0; n < 9; n++) {
-		if (strstr(ln, IEC_DATAFORMAT_PFX[n]) == ln) {
+		if (strstr(ln, pfx_dataformat[n]) == ln) {
 			dformat = n;
 			break;
 		}
@@ -189,7 +189,7 @@ void identify_literal(il_t *line, char **value) {
 	// erase data format prefix
 	if (dformat != LIT_NONE) {
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
-		(*line).data_format = IEC_LITERAL_FORMAT[dformat];
+		(*line).data_format = literal_format[dformat];
 		goto end;
 	}
 

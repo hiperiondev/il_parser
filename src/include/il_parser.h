@@ -197,7 +197,7 @@ typedef struct {
         il_t *result; //
 } parsed_il_t;
 
-int compile_il(char *file, parsed_il_t *parsed);
+ int compile_il(char *file, parsed_il_t *parsed);
 void free_il(parsed_il_t *il);
 
 #endif /* IL_H_ */

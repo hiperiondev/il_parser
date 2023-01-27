@@ -36,9 +36,9 @@
 #include "il_parser.h"
 typedef struct il il_t;
 
-extern const char *IEC_DATAFORMAT_PFX[];
-extern const uint8_t IEC_LITERAL_FORMAT[];
-extern const char *IEC_IECTYPE_PFX[];
+extern const char *pfx_dataformat[];
+extern const uint8_t literal_format[];
+extern const char *pfx_iectype[];
 extern const char phy_prefix_c[];
 extern const char phy_data_type_c[];
 
