@@ -113,7 +113,7 @@ program:
   [0025] ST %q0.0
   [0026] LD TIME_OF_DAY#11:36:15.20
   [0027] LD TIME#1h_15m_30s_60ms
-  [0028] CAL CTU_1 (var1:=%IW5, PV:=Limit, CU:=-12e6, STR:="str")
+  [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09)
   [0029] LD TIME#18ms
   [0030] LD DATE#2001-04-09
   [0031] LD DATE_AND_TIME#2001-04-09-11:36:15.20
@@ -124,6 +124,9 @@ program:
 
 > identify literals
 > parse values
+LIT_DURATION: 1H15M30S60MS
+LIT_DURATION: 1H15M30S60MS
+LIT_DURATION: 18MS
 
 ----------
 - RESULT (36)-
@@ -155,24 +158,24 @@ program:
   [0025] ST %QX0.0 (type: NULL#, format: LIT_PHY, value: Q, X, 0, 0)
   [0026] LD 11:36:15.20 (type: TOD#, format: LIT_TIME_OF_DAY, value: 11, 36, 15, 20)
   [0027] LD 1H 15M 30S 60MS (type: NULL#, format: LIT_DURATION, value: 1, 15, 30, 60)
-  [0028] CAL CTU_1 (var1:=%IW5, PV:=Limit, CU:=-12e6, STR:="str") (type: NULL#, format: LIT_CAL, value: [function])
-         [fn: CTU_1]
-             [var: var1 type: NULL#, format: LIT_PHY, value: I, W, 5, 0]    
-             [var: PV type: NULL#, format: LIT_VAR, value: Limit]    
+  [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09) (type: NULL#, format: LIT_CAL, value: [function])
+         [fn: FUN_3]
+             [var: var1 type: NULL#, format: LIT_DURATION, value: 1, 15, 30, 60]    
+             [var: PV type: DT#, format: LIT_DATE_AND_TIME, value: 2001, 4, 9, 11, 36, 15, 20]    
              [var: CU type: NULL#, format: LIT_REAL, value: -12000000.000000]    
-             [var: STR type: NULL#, format: LIT_STRING, value: str]    
+             [var: DT type: NULL#, format: LIT_DATE, value: 2001, 4, 9]    
   [0029] LD 18MS (type: NULL#, format: LIT_DURATION, value: 0, 0, 0, 18)
   [0030] LD 2001-04-09 (type: NULL#, format: LIT_DATE, value: 2001, 4, 9)
   [0031] LD 2001-04-09-11:36:15.20 (type: DT#, format: LIT_DATE_AND_TIME, value: 2001, 4, 9, 11, 36, 15, 20)
-  [0032] LD "this is a string" (type: NULL#, format: LIT_STRING, value: "this is a string")
-  [0033] LD "a" (type: NULL#, format: LIT_STRING, value: "a")
-  [0034] LD "AaBb" (type: NULL#, format: LIT_STRING, value: "AaBb")
+  [0032] LD this is a string (type: NULL#, format: LIT_STRING, value: this is a string)
+  [0033] LD a (type: NULL#, format: LIT_STRING, value: a)
+  [0034] LD AaBb (type: NULL#, format: LIT_STRING, value: AaBb)
   [0035] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string") (type: NULL#, format: LIT_CAL, value: [function])
          [fn: CTU_1]
              [var: RESET type: NULL#, format: LIT_PHY, value: I, X, 3, 6]    
-             [var: PV type: NULL#, format: LIT_VAR, value: Limit]    
+             [var: PV type: NULL#, format: LIT_VAR, value: LIMIT]    
              [var: CU type: NULL#, format: LIT_INTEGER, value: 145]    
-             [var: STR type: NULL#, format: LIT_STRING, value: string]    
+             [var: STR type: NULL#, format: LIT_STRING, value: STRING]    
   [0036] END  (type: NULL#, format: LIT_NONE, value: [null])
 
 < END test2 >
