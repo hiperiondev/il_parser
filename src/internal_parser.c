@@ -114,6 +114,28 @@ const char phy_data_type_c[] = {
     'D'
 };
 
+void delete_prefixes(char **str) {
+    int n;
+
+    replacestr(*str, "TRUE", "1");
+    replacestr(*str, "FALSE", "0");
+
+    replacestr(*str, "%", "PHY#");
+    replacestr(*str, "TIME_OF_DAY#", "TOD#");
+    replacestr(*str, "DATE_AND_TIME#", "DT#");
+    replacestr(*str, "TIME#", "T#");
+    replacestr(*str, "DATE#", "D#");
+    strremove(*str, "_");
+
+    for (n = 0; n < 32; n++)
+        strremove(*str, pfx_iectype[n]);
+
+    for (n = 0; n < 10; n++)
+        strremove(*str, pfx_dataformat[n]);
+
+    toUpperCase(*str);
+}
+
 void identify_literal(il_t *line, char **value) {
 	uint8_t n;
 	char *ln = NULL;
@@ -241,6 +263,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_DURATION:
+            printf("LIT_DURATION: %s\n", (*line).str);
             resultfn = parse_time_duration(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown duration\n", pos);
@@ -660,6 +683,7 @@ int parse_cal(il_t *line) {
 
         char *value;
         identify_literal(&((*line).data.cal.value[(*line).data.cal.len]), &value);
+        delete_prefixes(&((*line).data.cal.value[(*line).data.cal.len].str));
         int err = parse_value(&((*line).data.cal.value[(*line).data.cal.len]), 0);
         if (err != 0)
             exit(1);
