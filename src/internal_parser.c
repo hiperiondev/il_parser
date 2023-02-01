@@ -682,6 +682,8 @@ int parse_cal(il_t *line) {
     (*line).data.cal.var = malloc(sizeof(char*));
 
     while (right != NULL) {
+        char *value;
+
         split2((*line).str, '=', &((*line).str), &right);
         (*line).data.cal.var[(*line).data.cal.len] = calloc(strlen((*line).str) + 1, sizeof(char));
         memcpy((*line).data.cal.var[(*line).data.cal.len], (*line).str, strlen((*line).str));
@@ -690,13 +692,19 @@ int parse_cal(il_t *line) {
         (*line).data.cal.value[(*line).data.cal.len].str = calloc(strlen((*line).str) + 1, sizeof(char));
         strcpy((*line).data.cal.value[(*line).data.cal.len].str, (*line).str);
 
-        char *value;
-        printf("STR: %s\n", (*line).data.cal.value[(*line).data.cal.len].str);
+
+        char strline2[strlen((*line).str) + 1];
+        sprintf(strline2, "%s", (*line).data.cal.value[(*line).data.cal.len].str);
+        replacestr(strline2, "\"", "");
+
         identify_literal(&((*line).data.cal.value[(*line).data.cal.len]), &value);
         delete_prefixes(&((*line).data.cal.value[(*line).data.cal.len].str));
         int err = parse_value(&((*line).data.cal.value[(*line).data.cal.len]), 0);
+
         if (err != 0)
             exit(1);
+
+        strcpy((*line).data.cal.value[(*line).data.cal.len].str, strline2);
 
         ++(*line).data.cal.len;
         (*line).data.cal.value = realloc((*line).data.cal.value, ((*line).data.cal.len + 1) * sizeof(il_t));

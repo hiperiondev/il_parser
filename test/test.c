@@ -57,41 +57,6 @@ const char *lit_dataformat_str[] = {
     "LIT_NONE"           //
 };
 
-const char *il_commands_str[] = {
-        "NOP", //
-        "LD",  //
-        "ST",  //
-        "S",   //
-        "R",   //
-        "AND", //
-        "OR",  //
-        "XOR", //
-        "NOT", //
-        "ADD", //
-        "SUB", //
-        "MUL", //
-        "DIV", //
-        "GT",  //
-        "GE",  //
-        "EQ",  //
-        "NE",  //
-        "LE",  //
-        "LT",  //
-        "JMP", //
-        "CAL", //
-        "RET", //
-        "POP", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "END", //
-};
-
 /////////////
 
 #define PRINT_PARSED_LINE(line)                                                         \

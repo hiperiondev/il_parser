@@ -45,6 +45,8 @@
     #define DBG_PRINT(fmt, args...)
 #endif
 
+extern const char *il_commands_str[];
+
 enum IL_COMMANDS {
 //   instr  //       | modifiers |  description
     IL_NOP, //  0x00 |           |  Not operation
