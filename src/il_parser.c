@@ -154,6 +154,25 @@ const char *il_commands_str[] = {
         "END", //
 };
 
+const char *lit_dataformat_str[] = {
+    "LIT_BOOLEAN",       // 0x00
+    "LIT_DURATION",      // 0x01
+    "LIT_DATE",          // 0x02
+    "LIT_TIME_OF_DAY",   // 0x03
+    "LIT_DATE_AND_TIME", // 0x04
+    "LIT_INTEGER",       // 0x05
+    "LIT_REAL",          // 0x06
+    "LIT_REAL_EXP",      // 0x07
+    "LIT_BASE2",         // 0x08
+    "LIT_BASE8",         // 0x09
+    "LIT_BASE16",        // 0x0a
+    "LIT_PHY",           // 0x0c
+    "LIT_STRING",        // 0x0d
+    "LIT_VAR",           // 0x0e
+    "LIT_CAL",           // 0x0f
+    "LIT_NONE"           //
+};
+
 //////////////////////////////////
 
 int compile_il(char *file, parsed_il_t *parsed) {
@@ -287,13 +306,13 @@ int compile_il(char *file, parsed_il_t *parsed) {
         dataformat = LIT_NONE;
 
         if (line_parsed[pos].str == NULL || line_parsed[pos].code == IL_JMP) {
-            line_parsed[pos].data_type = datatype;
-            line_parsed[pos].data_format = dataformat;
+            line_parsed[pos].datatype = datatype;
+            line_parsed[pos].dataformat = dataformat;
             continue;
         }
 
         if(line_parsed[pos].code == IL_CAL){
-            line_parsed[pos].data_format = LIT_CAL;
+            line_parsed[pos].dataformat = LIT_CAL;
             continue;
         }
 
@@ -321,7 +340,7 @@ int compile_il(char *file, parsed_il_t *parsed) {
 
 void free_il(parsed_il_t *il) {
     for (int n = 0; n < il->lines; n++) {
-        if (il->result[n].data_format == LIT_CAL) {
+        if (il->result[n].dataformat == LIT_CAL) {
             for (int m = 0; m < il->result[n].data.cal.len; m++) {
                 free(il->result[n].data.cal.var[m]);
                 free(il->result[n].data.cal.value[m].str);
@@ -341,7 +360,7 @@ void json_values(il_t line, char **dest, char *str2, int pos, JSON_Object **root
     JSON_Object *root_object = *root;
     char str[2048];
 
-    switch (line.data_format) {
+    switch (line.dataformat) {
         case LIT_BOOLEAN:
             sprintf(str, "%s.%s.bool", str2, "value");
             json_object_dotset_number(root_object, str, line.data.integer);
@@ -448,12 +467,20 @@ int parsed2json(parsed_il_t parsed, char **dest) {
         json_object_dotset_number(root_object, str, parsed.result[pos].n);
         sprintf(str, "program.%d.%s", pos + 1, "push");
         json_object_dotset_number(root_object, str, parsed.result[pos].p);
-        sprintf(str, "program.%d.%s", pos + 1, "argument.datatype");
-        json_object_dotset_number(root_object, str, parsed.result[pos].data_type);
-        sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat");
-        json_object_dotset_number(root_object, str, parsed.result[pos].data_format);
 
-        if (parsed.result[pos].data_format != LIT_CAL) {
+        sprintf(str2, pfx_iectype[parsed.result[pos].datatype]);
+        strremove(str2, "#");
+        sprintf(str, "program.%d.%s", pos + 1, "argument.datatype_str");
+        json_object_dotset_string(root_object, str, str2);
+        sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat_str");
+        json_object_dotset_string(root_object, str, lit_dataformat_str[parsed.result[pos].dataformat]);
+
+        sprintf(str, "program.%d.%s", pos + 1, "argument.datatype");
+        json_object_dotset_number(root_object, str, parsed.result[pos].datatype);
+        sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat");
+        json_object_dotset_number(root_object, str, parsed.result[pos].dataformat);
+
+        if (parsed.result[pos].dataformat != LIT_CAL) {
             sprintf(str, "program.%d.argument.str", pos + 1);
             json_object_dotset_string(root_object, str, parsed.result[pos].str);
             sprintf(str2, "program.%d.argument", pos + 1);
@@ -465,9 +492,9 @@ int parsed2json(parsed_il_t parsed, char **dest) {
                 sprintf(str, "program.%d.argument.variables.%s.str", pos + 1, parsed.result[pos].data.cal.var[n]);
                 json_object_dotset_string(root_object, str, parsed.result[pos].data.cal.value[n].str);
                 sprintf(str, "program.%d.%s.%s.datatype", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].data_type);
+                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].datatype);
                 sprintf(str, "program.%d.%s.%s.dataformat", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].data_format);
+                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].dataformat);
                 sprintf(str2, "program.%d.%s.%s", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
                 json_values(parsed.result[pos].data.cal.value[n], dest, str2, pos, &root_object);
             }

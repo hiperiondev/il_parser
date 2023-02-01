@@ -155,44 +155,44 @@ void identify_literal(il_t *line, char **value) {
 	// delete _
 	ln = strremove(ln, "_");
 
-	(*line).data_format = LIT_VAR;
+	(*line).dataformat = LIT_VAR;
 
 	// search typed literal
-	(*line).data_type = 0;
+	(*line).datatype = 0;
 	for (n = 1; n < 32; n++) {
 		if (strstr(ln, pfx_iectype[n]) == ln) {
-		    (*line).data_type = n;
+		    (*line).datatype = n;
 			break;
 		}
 	}
 
-    if ((*line).data_type == IEC_T_PHY) { // is phy
-        (*line).data_type = 0;
-        (*line).data_format = LIT_PHY;
+    if ((*line).datatype == IEC_T_PHY) { // is phy
+        (*line).datatype = 0;
+        (*line).dataformat = LIT_PHY;
         replacestr(ln, "PHY#", "%");
         goto end;
     }
 
-    if ((*line).data_type != 0)
+    if ((*line).datatype != 0)
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
 
-	if ((*line).data_type == IEC_T_BOOL) { // is bool
-	    (*line).data_format = LIT_BOOLEAN;
+	if ((*line).datatype == IEC_T_BOOL) { // is bool
+	    (*line).dataformat = LIT_BOOLEAN;
 		goto end;
 	}
 
-	if ((*line).data_type == IEC_T_TOD) { //is TOD
-	    (*line).data_format = LIT_TIME_OF_DAY;
+	if ((*line).datatype == IEC_T_TOD) { //is TOD
+	    (*line).dataformat = LIT_TIME_OF_DAY;
         goto end;
     }
 
-	if ((*line).data_type == IEC_T_DT) { // is DT
-	    (*line).data_format = LIT_DATE_AND_TIME;
+	if ((*line).datatype == IEC_T_DT) { // is DT
+	    (*line).dataformat = LIT_DATE_AND_TIME;
         goto end;
     }
 
 	if ((ln[0] == '"' && ln[strlen(ln) - 1] == '"') || (ln[0] == '\'' && ln[strlen(ln) - 1] == '\'')) {
-	    (*line).data_format = LIT_STRING;
+	    (*line).dataformat = LIT_STRING;
 	    ln = (*line).str;
 	    goto end;
 	}
@@ -209,33 +209,33 @@ void identify_literal(il_t *line, char **value) {
 	// erase data format prefix
 	if (dformat != LIT_NONE) {
 		memmove(ln, strchr(ln, '#') + 1, strlen(strchr(ln, '#')) + 1);
-		(*line).data_format = literal_format[dformat];
+		(*line).dataformat = literal_format[dformat];
 		goto end;
 	}
 
 	if(dformat == LIT_DURATION) {
-	    (*line).data_format = LIT_DURATION;
-	    (*line).data_type = IEC_T_TIME;
+	    (*line).dataformat = LIT_DURATION;
+	    (*line).datatype = IEC_T_TIME;
 	    goto end;
 	}
 
 	if (!strcmp((*line).str, "0") || !strcmp((*line).str, "1")) {
-	    (*line).data_format = LIT_BOOLEAN;
+	    (*line).dataformat = LIT_BOOLEAN;
 		goto end;
 	}
 
 	if (strisinteger(ln)) {
-	    (*line).data_format = LIT_INTEGER;
+	    (*line).dataformat = LIT_INTEGER;
 		goto end;
 	}
 
 	if (strisfloat(ln)) {
-	    (*line).data_format = LIT_REAL;
+	    (*line).dataformat = LIT_REAL;
 		goto end;
     }
 
     if (strisrealexp(ln)) {
-        (*line).data_format = LIT_REAL_EXP;
+        (*line).dataformat = LIT_REAL_EXP;
         goto end;
     }
 
@@ -249,7 +249,7 @@ end:
 int parse_value(il_t *line, int pos) {
     long int value;
     int resultfn;
-    switch ((*line).data_format) {
+    switch ((*line).dataformat) {
         case LIT_BOOLEAN:
             toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 2);
@@ -326,7 +326,7 @@ int parse_value(il_t *line, int pos) {
                 return -8;
 
             (*line).data.real = atof((*line).str);
-            (*line).data_format = LIT_REAL;
+            (*line).dataformat = LIT_REAL;
             break;
 
         case LIT_BASE2:
@@ -338,7 +338,7 @@ int parse_value(il_t *line, int pos) {
                 return -9;
             }
             (*line).data.uinteger = value;
-            (*line).data_format = LIT_INTEGER;
+            (*line).dataformat = LIT_INTEGER;
             break;
 
         case LIT_BASE8:
@@ -350,7 +350,7 @@ int parse_value(il_t *line, int pos) {
                 return -10;
             }
             (*line).data.uinteger = value;
-            (*line).data_format = LIT_INTEGER;
+            (*line).dataformat = LIT_INTEGER;
             break;
 
         case LIT_BASE16:
@@ -362,7 +362,7 @@ int parse_value(il_t *line, int pos) {
                 return -11;
             }
             (*line).data.uinteger = value;
-            (*line).data_format = LIT_INTEGER;
+            (*line).dataformat = LIT_INTEGER;
             break;
 
         case LIT_PHY:
@@ -423,7 +423,7 @@ int parse_phy(il_t *line) {
     if ((*line).data.phy.prefix == PHY_NONE)
         return -1;
 
-    (*line).data_type = PHY_BIT;
+    (*line).datatype = PHY_BIT;
     for (n = 0; n <= PHY_DOUBLE; n++) {
         if ((*line).str[1] == phy_data_type_c[n]) {
             (*line).data.phy.datatype = n;

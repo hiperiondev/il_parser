@@ -46,6 +46,7 @@
 #endif
 
 extern const char *il_commands_str[];
+extern const char *lit_dataformat_str[];
 
 enum IL_COMMANDS {
 //   instr  //       | modifiers |  description
@@ -159,8 +160,8 @@ struct il {
              bool c;            // conditional
              bool n;            // negate
              bool p;            // push '('
-          uint8_t data_type;    //
-          uint8_t data_format;  //
+          uint8_t datatype;    //
+          uint8_t dataformat;  //
     union {
           double real;          //
         uint32_t jmp_addr;      //

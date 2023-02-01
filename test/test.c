@@ -38,32 +38,13 @@
 #include "il_parser.h"
 #include "internal_parser.h"
 
-const char *lit_dataformat_str[] = {
-    "LIT_BOOLEAN",       // 0x00
-    "LIT_DURATION",      // 0x01
-    "LIT_DATE",          // 0x02
-    "LIT_TIME_OF_DAY",   // 0x03
-    "LIT_DATE_AND_TIME", // 0x04
-    "LIT_INTEGER",       // 0x05
-    "LIT_REAL",          // 0x06
-    "LIT_REAL_EXP",      // 0x07
-    "LIT_BASE2",         // 0x08
-    "LIT_BASE8",         // 0x09
-    "LIT_BASE16",        // 0x0a
-    "LIT_PHY",           // 0x0c
-    "LIT_STRING",        // 0x0d
-    "LIT_VAR",           // 0x0e
-    "LIT_CAL",           // 0x0f
-    "LIT_NONE"           //
-};
-
 /////////////
 
 #define PRINT_PARSED_LINE(line)                                                         \
             char addr[2048], temp_string[2048]="";                                      \
             sprintf(addr, "%u", line.data.jmp_addr);                                    \
             if(line.code != IL_JMP) {                                                   \
-                if (line.data_format == LIT_PHY)                                        \
+                if (line.dataformat == LIT_PHY)                                        \
                     if(line.data.phy.datatype == PHY_BIT) {                             \
                         sprintf(temp_string, "%%%c%c%u.%u",                             \
                             phy_prefix_c[line.data.phy.prefix],                         \
@@ -89,9 +70,9 @@ const char *lit_dataformat_str[] = {
                     line.n ? "N" : "",                                                  \
                     line.p ? "(" : "",                                                  \
                     line.code == IL_JMP ? addr : temp_string,                           \
-                    pfx_iectype[line.data_type], lit_dataformat_str[line.data_format]   \
+                    pfx_iectype[line.datatype], lit_dataformat_str[line.dataformat]   \
             );                                                                          \
-            switch(line.data_format) {                                                  \
+            switch(line.dataformat) {                                                  \
                 case LIT_PHY:                                                           \
                       printf("%c, %c, %d, %d)\n",                                       \
                           phy_prefix_c[line.data.phy.prefix],                           \
@@ -155,8 +136,8 @@ const char *lit_dataformat_str[] = {
                       for(int n = 0; n<line.data.cal.len; n++) {                        \
                           printf("             [var: %s type: %s, format: %s, value: ", \
                               line.data.cal.var[n],                                     \
-							  pfx_iectype[line.data.cal.value[n].data_type],            \
-							  lit_dataformat_str[line.data.cal.value[n].data_format]    \
+							  pfx_iectype[line.data.cal.value[n].datatype],            \
+							  lit_dataformat_str[line.data.cal.value[n].dataformat]    \
                           );                                                            \
                           PRINT_VALUE(line.data.cal.value[n]);                          \
                           printf("]    \n");                                            \
@@ -171,7 +152,7 @@ const char *lit_dataformat_str[] = {
              }
 
 #define PRINT_VALUE(line)                                          \
-            switch(line.data_format) {                             \
+            switch(line.dataformat) {                             \
                 case LIT_PHY:                                      \
                       printf("%c, %c, %d, %d",                     \
                           phy_prefix_c[line.data.phy.prefix],      \
