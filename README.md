@@ -155,7 +155,7 @@ program:
   [0025] ST %QX0.0 (type: NULL#, format: LIT_PHY, value: Q, X, 0, 0)
   [0026] LD 11:36:15.20 (type: TOD#, format: LIT_TIME_OF_DAY, value: 11, 36, 15, 20)
   [0027] LD 1H 15M 30S 60MS (type: NULL#, format: LIT_DURATION, value: 1, 15, 30, 60)
-  [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09) (type: NULL#, format: LIT_CAL, value: [function])
+  [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09 (type: NULL#, format: LIT_CAL, value: [function])
          [fn: FUN_3]
              [var: var1 type: NULL#, format: LIT_DURATION, value: 1, 15, 30, 60]    
              [var: PV type: DT#, format: LIT_DATE_AND_TIME, value: 2001, 4, 9, 11, 36, 15, 20]    
@@ -167,13 +167,616 @@ program:
   [0032] LD this is a string (type: NULL#, format: LIT_STRING, value: this is a string)
   [0033] LD a (type: NULL#, format: LIT_STRING, value: a)
   [0034] LD AaBb (type: NULL#, format: LIT_STRING, value: AaBb)
-  [0035] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string") (type: NULL#, format: LIT_CAL, value: [function])
+  [0035] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string" (type: NULL#, format: LIT_CAL, value: [function])
          [fn: CTU_1]
              [var: RESET type: NULL#, format: LIT_PHY, value: I, X, 3, 6]    
              [var: PV type: NULL#, format: LIT_VAR, value: LIMIT]    
              [var: CU type: NULL#, format: LIT_INTEGER, value: 145]    
              [var: STR type: NULL#, format: LIT_STRING, value: STRING]    
   [0036] END  (type: NULL#, format: LIT_NONE, value: [null])
+
+----------
+- JSON -
+----------
+
+{
+    "program": {
+        "1": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 0,
+                    "datatype": 0,
+                    "phy_a": 0,
+                    "phy_b": 0
+                }
+            }
+        },
+        "2": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 1,
+                    "phy_a": 0,
+                    "phy_b": 0
+                }
+            }
+        },
+        "3": {
+            "code": 15,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 3,
+                    "phy_b": 0
+                }
+            }
+        },
+        "4": {
+            "code": 19,
+            "conditional": 1,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "5": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 1,
+            "push": 0,
+            "argument": {
+                "datatype": 1,
+                "dataformat": 0,
+                "value": {
+                    "bool": 1
+                }
+            }
+        },
+        "6": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 1,
+                    "phy_b": 0
+                }
+            }
+        },
+        "7": {
+            "code": 15,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 3,
+                    "phy_b": 0
+                }
+            }
+        },
+        "8": {
+            "code": 19,
+            "conditional": 1,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "9": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 5,
+                "value": {
+                    "integer": 450
+                }
+            }
+        },
+        "10": {
+            "code": 15,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 1,
+                    "phy_b": 0
+                }
+            }
+        },
+        "11": {
+            "code": 19,
+            "conditional": 1,
+            "negate": 1,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "12": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 6,
+                "dataformat": 5,
+                "value": {
+                    "integer": 165
+                }
+            }
+        },
+        "13": {
+            "code": 18,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 1,
+                    "phy_b": 0
+                }
+            }
+        },
+        "14": {
+            "code": 19,
+            "conditional": 1,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "15": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 6,
+                "value": {
+                    "real": 23.600000000000001
+                }
+            }
+        },
+        "16": {
+            "code": 10,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 1,
+                    "phy_b": 0
+                }
+            }
+        },
+        "17": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 0,
+                    "phy_b": 0
+                }
+            }
+        },
+        "18": {
+            "code": 19,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "19": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 6,
+                "value": {
+                    "real": -0.00012
+                }
+            }
+        },
+        "20": {
+            "code": 10,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 0,
+                    "phy_b": 0
+                }
+            }
+        },
+        "21": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 2,
+                    "datatype": 0,
+                    "phy_a": 1,
+                    "phy_b": 0
+                }
+            }
+        },
+        "22": {
+            "code": 19,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        },
+        "23": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 13,
+                "value": {
+                    "variable": "a_Variable_23"
+                }
+            }
+        },
+        "24": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 1,
+                    "datatype": 2,
+                    "phy_a": 5,
+                    "phy_b": 0
+                }
+            }
+        },
+        "25": {
+            "code": 2,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 11,
+                "value": {
+                    "prefix": 1,
+                    "datatype": 0,
+                    "phy_a": 0,
+                    "phy_b": 0
+                }
+            }
+        },
+        "26": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 18,
+                "dataformat": 3,
+                "value": {
+                    "msec": 20,
+                    "sec": 15,
+                    "min": 36,
+                    "hour": 11
+                }
+            }
+        },
+        "27": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 1,
+                "value": {
+                    "msec": 60,
+                    "sec": 30,
+                    "min": 15,
+                    "hour": 1
+                }
+            }
+        },
+        "28": {
+            "code": 20,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 14,
+                "function": "FUN_3",
+                "variables": {
+                    "var1": {
+                        "datatype": 0,
+                        "dataformat": 1,
+                        "value": {
+                            "msec": 60,
+                            "sec": 30,
+                            "min": 15,
+                            "hour": 1
+                        }
+                    },
+                    "PV": {
+                        "datatype": 19,
+                        "dataformat": 4,
+                        "value": {
+                            "msec": 20,
+                            "sec": 15,
+                            "min": 36,
+                            "hour": 11,
+                            "day": 9,
+                            "month": 4,
+                            "year": 2001
+                        }
+                    },
+                    "CU": {
+                        "datatype": 0,
+                        "dataformat": 6,
+                        "value": {
+                            "real": -12000000
+                        }
+                    },
+                    "DT": {
+                        "datatype": 0,
+                        "dataformat": 2,
+                        "value": {
+                            "day": 9,
+                            "month": 4,
+                            "year": 2001
+                        }
+                    }
+                }
+            }
+        },
+        "29": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 1,
+                "value": {
+                    "msec": 18,
+                    "sec": 0,
+                    "min": 0,
+                    "hour": 0
+                }
+            }
+        },
+        "30": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 2,
+                "value": {
+                    "day": 9,
+                    "month": 4,
+                    "year": 2001
+                }
+            }
+        },
+        "31": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 19,
+                "dataformat": 4,
+                "value": {
+                    "msec": 20,
+                    "sec": 15,
+                    "min": 36,
+                    "hour": 11,
+                    "day": 9,
+                    "month": 4,
+                    "year": 2001
+                }
+            }
+        },
+        "32": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 12,
+                "value": {
+                    "string": "this is a string"
+                }
+            }
+        },
+        "33": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 12,
+                "value": {
+                    "string": "a"
+                }
+            }
+        },
+        "34": {
+            "code": 1,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 12,
+                "value": {
+                    "string": "AaBb"
+                }
+            }
+        },
+        "35": {
+            "code": 20,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 14,
+                "function": "CTU_1",
+                "variables": {
+                    "RESET": {
+                        "datatype": 0,
+                        "dataformat": 11,
+                        "value": {
+                            "prefix": 0,
+                            "datatype": 0,
+                            "phy_a": 3,
+                            "phy_b": 6
+                        }
+                    },
+                    "PV": {
+                        "datatype": 0,
+                        "dataformat": 13,
+                        "value": {
+                            "variable": "LIMIT"
+                        }
+                    },
+                    "CU": {
+                        "datatype": 0,
+                        "dataformat": 5,
+                        "value": {
+                            "integer": 145
+                        }
+                    },
+                    "STR": {
+                        "datatype": 0,
+                        "dataformat": 12,
+                        "value": {
+                            "string": "STRING"
+                        }
+                    }
+                }
+            }
+        },
+        "36": {
+            "code": 31,
+            "conditional": 0,
+            "negate": 0,
+            "push": 0,
+            "argument": {
+                "datatype": 0,
+                "dataformat": 15,
+                "value": {
+                    "none": 0
+                }
+            }
+        }
+    }
+}
 
 < END test2 >
 --------------------------------------------
