@@ -199,5 +199,6 @@ typedef struct {
 
  int compile_il(char *file, parsed_il_t *parsed);
 void free_il(parsed_il_t *il);
+int parsed2json(parsed_il_t parsed, char **dest);
 
 #endif /* IL_H_ */

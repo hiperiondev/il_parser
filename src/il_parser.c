@@ -38,6 +38,7 @@
 #include "il_parser.h"
 #include "strings.h"
 #include "internal_parser.h"
+#include "parson.h"
 
 #define ELEMENT_END(v)         \
             (v).str = NULL;    \
@@ -299,4 +300,140 @@ void free_il(parsed_il_t *il) {
         }
     }
     free(il->result);
+}
+
+void json_values(il_t line, char **dest, char *str2, int pos, JSON_Object **root) {
+    JSON_Object *root_object = *root;
+    char str[2048];
+
+    switch (line.data_format) {
+        case LIT_BOOLEAN:
+            sprintf(str, "%s.%s.bool", str2, "value");
+            json_object_dotset_number(root_object, str, line.data.integer);
+            break;
+
+        case LIT_TIME_OF_DAY:
+        case LIT_DURATION:
+            sprintf(str, "%s.%s", str2, "value.msec");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.msec);
+            sprintf(str, "%s.%s", str2, "value.sec");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.sec);
+            sprintf(str, "%s.%s", str2, "value.min");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.min);
+            sprintf(str, "%s.%s", str2, "value.hour");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.hour);
+            break;
+
+        case LIT_DATE:
+            sprintf(str, "%s.%s", str2, "value.day");
+            json_object_dotset_number(root_object, str, line.data.dt.date.day);
+            sprintf(str, "%s.%s", str2, "value.month");
+            json_object_dotset_number(root_object, str, line.data.dt.date.month);
+            sprintf(str, "%s.%s", str2, "value.year");
+            json_object_dotset_number(root_object, str, line.data.dt.date.year);
+            break;
+
+        case LIT_DATE_AND_TIME:
+            sprintf(str, "%s.%s", str2, "value.msec");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.msec);
+            sprintf(str, "%s.%s", str2, "value.sec");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.sec);
+            sprintf(str, "%s.%s", str2, "value.min");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.min);
+            sprintf(str, "%s.%s", str2, "value.hour");
+            json_object_dotset_number(root_object, str, line.data.dt.tod.hour);
+            sprintf(str, "%s.%s", str2, "value.day");
+            json_object_dotset_number(root_object, str, line.data.dt.date.day);
+            sprintf(str, "%s.%s", str2, "value.month");
+            json_object_dotset_number(root_object, str, line.data.dt.date.month);
+            sprintf(str, "%s.%s", str2, "value.year");
+            json_object_dotset_number(root_object, str, line.data.dt.date.year);
+            break;
+
+        case LIT_REAL_EXP:
+        case LIT_REAL:
+            sprintf(str, "%s.%s", str2, "value.real");
+            json_object_dotset_number(root_object, str, line.data.real);
+            break;
+
+        case LIT_BASE2:
+        case LIT_BASE8:
+        case LIT_BASE16:
+        case LIT_INTEGER:
+            sprintf(str, "%s.%s", str2, "value.integer");
+            json_object_dotset_number(root_object, str, line.data.integer);
+            break;
+
+        case LIT_PHY:
+            sprintf(str, "%s.%s", str2, "value.prefix");
+            json_object_dotset_number(root_object, str, line.data.phy.prefix);
+            sprintf(str, "%s.%s", str2, "value.datatype");
+            json_object_dotset_number(root_object, str, line.data.phy.datatype);
+            sprintf(str, "%s.%s", str2, "value.phy_a");
+            json_object_dotset_number(root_object, str, line.data.phy.phy_a);
+            sprintf(str, "%s.%s", str2, "value.phy_b");
+            json_object_dotset_number(root_object, str, line.data.phy.phy_b);
+            break;
+
+        case LIT_STRING:
+            sprintf(str, "%s.%s", str2, "value.string");
+            json_object_dotset_string(root_object, str, line.str);
+            break;
+
+        case LIT_VAR:
+            sprintf(str, "%s.%s", str2, "value.variable");
+            json_object_dotset_string(root_object, str, line.str);
+            break;
+
+        case LIT_NONE:
+            sprintf(str, "%s.%s", str2, "value.none");
+            json_object_dotset_number(root_object, str, 0);
+            break;
+
+        default:
+    }
+
+    *root = root_object;
+}
+
+int parsed2json(parsed_il_t parsed, char **dest) {
+    char str[1024], str2[1024];
+
+    JSON_Value *root_value = json_value_init_object();
+    JSON_Object *root_object = json_value_get_object(root_value);
+
+    for (int pos = 0; pos < parsed.lines; pos++) {
+        sprintf(str, "program.%d.%s", pos + 1, "code");
+        json_object_dotset_number(root_object, str, parsed.result[pos].code);
+        sprintf(str, "program.%d.%s", pos + 1, "conditional");
+        json_object_dotset_number(root_object, str, parsed.result[pos].c);
+        sprintf(str, "program.%d.%s", pos + 1, "negate");
+        json_object_dotset_number(root_object, str, parsed.result[pos].n);
+        sprintf(str, "program.%d.%s", pos + 1, "push");
+        json_object_dotset_number(root_object, str, parsed.result[pos].p);
+        sprintf(str, "program.%d.%s", pos + 1, "argument.datatype");
+        json_object_dotset_number(root_object, str, parsed.result[pos].data_type);
+        sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat");
+        json_object_dotset_number(root_object, str, parsed.result[pos].data_format);
+
+        if (parsed.result[pos].data_format != LIT_CAL) {
+            sprintf(str2, "program.%d.argument", pos + 1);
+            json_values(parsed.result[pos], dest, str2, pos, &root_object);
+        } else {
+            sprintf(str, "program.%d.%s", pos + 1, "argument.function");
+            json_object_dotset_string(root_object, str, parsed.result[pos].data.cal.func);
+            for (int n = 0; n < parsed.result[pos].data.cal.len; n++) {
+                sprintf(str, "program.%d.%s.%s.datatype", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
+                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].data_type);
+                sprintf(str, "program.%d.%s.%s.dataformat", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
+                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].data_format);
+                sprintf(str2, "program.%d.%s.%s", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);;
+                json_values(parsed.result[pos].data.cal.value[n], dest, str2, pos, &root_object);
+            }
+        }
+    }
+
+    *dest = json_serialize_to_string_pretty(root_value);
+    json_value_free(root_value);
+    return 0;
 }

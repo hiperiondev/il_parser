@@ -300,6 +300,14 @@ int main(void) {
         PRINT_PARSED_LINE(parsed.result[pos]);
     }
 
+    printf("\n----------\n- JSON -\n----------\n");
+
+    char *dest = NULL;
+
+    parsed2json(parsed, &dest);
+    printf("\n%s\n", dest);
+
+    free(dest);
     free_il(&parsed);
     printf("\n< END test2 >\n--------------------------------------------\n\n");
 
