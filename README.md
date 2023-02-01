@@ -170,9 +170,9 @@ program:
   [0035] CAL CTU_1 (RESET:=%IX3.6, PV:=Limit, CU:=145, STR:="string" (type: NULL#, format: LIT_CAL, value: [function])
          [fn: CTU_1]
              [var: RESET type: NULL#, format: LIT_PHY, value: I, X, 3, 6]    
-             [var: PV type: NULL#, format: LIT_VAR, value: LIMIT]    
+             [var: PV type: NULL#, format: LIT_VAR, value: Limit]    
              [var: CU type: NULL#, format: LIT_INTEGER, value: 145]    
-             [var: STR type: NULL#, format: LIT_STRING, value: STRING]    
+             [var: STR type: NULL#, format: LIT_STRING, value: string]    
   [0036] END  (type: NULL#, format: LIT_NONE, value: [null])
 
 ----------
@@ -182,6 +182,7 @@ program:
 {
     "program": {
         "1": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -189,6 +190,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%I0.0",
                 "value": {
                     "prefix": 0,
                     "datatype": 0,
@@ -198,6 +200,7 @@ program:
             }
         },
         "2": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -205,6 +208,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%MB0",
                 "value": {
                     "prefix": 2,
                     "datatype": 1,
@@ -214,6 +218,7 @@ program:
             }
         },
         "3": {
+            "instruction": "EQ",
             "code": 15,
             "conditional": 0,
             "negate": 0,
@@ -221,6 +226,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M3.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -230,6 +236,7 @@ program:
             }
         },
         "4": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 1,
             "negate": 0,
@@ -243,6 +250,7 @@ program:
             }
         },
         "5": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 1,
@@ -250,12 +258,14 @@ program:
             "argument": {
                 "datatype": 1,
                 "dataformat": 0,
+                "str": "1",
                 "value": {
                     "bool": 1
                 }
             }
         },
         "6": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -263,6 +273,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M1.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -272,6 +283,7 @@ program:
             }
         },
         "7": {
+            "instruction": "EQ",
             "code": 15,
             "conditional": 0,
             "negate": 0,
@@ -279,6 +291,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M3.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -288,6 +301,7 @@ program:
             }
         },
         "8": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 1,
             "negate": 0,
@@ -301,6 +315,7 @@ program:
             }
         },
         "9": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -308,12 +323,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 5,
+                "str": "450",
                 "value": {
                     "integer": 450
                 }
             }
         },
         "10": {
+            "instruction": "EQ",
             "code": 15,
             "conditional": 0,
             "negate": 0,
@@ -321,6 +338,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M1.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -330,6 +348,7 @@ program:
             }
         },
         "11": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 1,
             "negate": 1,
@@ -343,6 +362,7 @@ program:
             }
         },
         "12": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -350,12 +370,14 @@ program:
             "argument": {
                 "datatype": 6,
                 "dataformat": 5,
+                "str": "A5",
                 "value": {
                     "integer": 165
                 }
             }
         },
         "13": {
+            "instruction": "LT",
             "code": 18,
             "conditional": 0,
             "negate": 0,
@@ -363,6 +385,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M1.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -372,6 +395,7 @@ program:
             }
         },
         "14": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 1,
             "negate": 0,
@@ -385,6 +409,7 @@ program:
             }
         },
         "15": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -392,12 +417,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 6,
+                "str": "23.6",
                 "value": {
                     "real": 23.600000000000001
                 }
             }
         },
         "16": {
+            "instruction": "SUB",
             "code": 10,
             "conditional": 0,
             "negate": 0,
@@ -405,6 +432,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M1.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -414,6 +442,7 @@ program:
             }
         },
         "17": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -421,6 +450,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M0.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -430,6 +460,7 @@ program:
             }
         },
         "18": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 0,
             "negate": 0,
@@ -443,6 +474,7 @@ program:
             }
         },
         "19": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -450,12 +482,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 6,
+                "str": "-12E-5",
                 "value": {
                     "real": -0.00012
                 }
             }
         },
         "20": {
+            "instruction": "SUB",
             "code": 10,
             "conditional": 0,
             "negate": 0,
@@ -463,6 +497,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M0.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -472,6 +507,7 @@ program:
             }
         },
         "21": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -479,6 +515,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%M1.0",
                 "value": {
                     "prefix": 2,
                     "datatype": 0,
@@ -488,6 +525,7 @@ program:
             }
         },
         "22": {
+            "instruction": "JMP",
             "code": 19,
             "conditional": 0,
             "negate": 0,
@@ -501,6 +539,7 @@ program:
             }
         },
         "23": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -508,12 +547,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 13,
+                "str": "a_Variable_23",
                 "value": {
                     "variable": "a_Variable_23"
                 }
             }
         },
         "24": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -521,6 +562,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%QW5",
                 "value": {
                     "prefix": 1,
                     "datatype": 2,
@@ -530,6 +572,7 @@ program:
             }
         },
         "25": {
+            "instruction": "ST",
             "code": 2,
             "conditional": 0,
             "negate": 0,
@@ -537,6 +580,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 11,
+                "str": "%Q0.0",
                 "value": {
                     "prefix": 1,
                     "datatype": 0,
@@ -546,6 +590,7 @@ program:
             }
         },
         "26": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -553,6 +598,7 @@ program:
             "argument": {
                 "datatype": 18,
                 "dataformat": 3,
+                "str": "11:36:15.20",
                 "value": {
                     "msec": 20,
                     "sec": 15,
@@ -562,6 +608,7 @@ program:
             }
         },
         "27": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -569,6 +616,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 1,
+                "str": "1H 15M 30S 60MS",
                 "value": {
                     "msec": 60,
                     "sec": 30,
@@ -578,6 +626,7 @@ program:
             }
         },
         "28": {
+            "instruction": "CAL",
             "code": 20,
             "conditional": 0,
             "negate": 0,
@@ -588,6 +637,7 @@ program:
                 "function": "FUN_3",
                 "variables": {
                     "var1": {
+                        "str": "TIME#1h_15m_30s_60ms",
                         "datatype": 0,
                         "dataformat": 1,
                         "value": {
@@ -598,6 +648,7 @@ program:
                         }
                     },
                     "PV": {
+                        "str": "DATE_AND_TIME#2001-04-09-11:36:15.20",
                         "datatype": 19,
                         "dataformat": 4,
                         "value": {
@@ -611,6 +662,7 @@ program:
                         }
                     },
                     "CU": {
+                        "str": "-12e6",
                         "datatype": 0,
                         "dataformat": 6,
                         "value": {
@@ -618,6 +670,7 @@ program:
                         }
                     },
                     "DT": {
+                        "str": "DATE#2001-04-09",
                         "datatype": 0,
                         "dataformat": 2,
                         "value": {
@@ -630,6 +683,7 @@ program:
             }
         },
         "29": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -637,6 +691,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 1,
+                "str": "18MS",
                 "value": {
                     "msec": 18,
                     "sec": 0,
@@ -646,6 +701,7 @@ program:
             }
         },
         "30": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -653,6 +709,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 2,
+                "str": "2001-04-09",
                 "value": {
                     "day": 9,
                     "month": 4,
@@ -661,6 +718,7 @@ program:
             }
         },
         "31": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -668,6 +726,7 @@ program:
             "argument": {
                 "datatype": 19,
                 "dataformat": 4,
+                "str": "2001-04-09-11:36:15.20",
                 "value": {
                     "msec": 20,
                     "sec": 15,
@@ -680,6 +739,7 @@ program:
             }
         },
         "32": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -687,12 +747,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 12,
+                "str": "this is a string",
                 "value": {
                     "string": "this is a string"
                 }
             }
         },
         "33": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -700,12 +762,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 12,
+                "str": "a",
                 "value": {
                     "string": "a"
                 }
             }
         },
         "34": {
+            "instruction": "LD",
             "code": 1,
             "conditional": 0,
             "negate": 0,
@@ -713,12 +777,14 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 12,
+                "str": "AaBb",
                 "value": {
                     "string": "AaBb"
                 }
             }
         },
         "35": {
+            "instruction": "CAL",
             "code": 20,
             "conditional": 0,
             "negate": 0,
@@ -729,6 +795,7 @@ program:
                 "function": "CTU_1",
                 "variables": {
                     "RESET": {
+                        "str": "%IX3.6",
                         "datatype": 0,
                         "dataformat": 11,
                         "value": {
@@ -739,13 +806,15 @@ program:
                         }
                     },
                     "PV": {
+                        "str": "Limit",
                         "datatype": 0,
                         "dataformat": 13,
                         "value": {
-                            "variable": "LIMIT"
+                            "variable": "Limit"
                         }
                     },
                     "CU": {
+                        "str": "145",
                         "datatype": 0,
                         "dataformat": 5,
                         "value": {
@@ -753,16 +822,18 @@ program:
                         }
                     },
                     "STR": {
+                        "str": "string",
                         "datatype": 0,
                         "dataformat": 12,
                         "value": {
-                            "string": "STRING"
+                            "string": "string"
                         }
                     }
                 }
             }
         },
         "36": {
+            "instruction": "END",
             "code": 31,
             "conditional": 0,
             "negate": 0,
@@ -770,6 +841,7 @@ program:
             "argument": {
                 "datatype": 0,
                 "dataformat": 15,
+                "str": "",
                 "value": {
                     "none": 0
                 }
