@@ -132,8 +132,6 @@ void delete_prefixes(char **str) {
 
     for (n = 0; n < 10; n++)
         strremove(*str, pfx_dataformat[n]);
-
-    toUpperCase(*str);
 }
 
 void identify_literal(il_t *line, char **value) {
@@ -253,6 +251,7 @@ int parse_value(il_t *line, int pos) {
     int resultfn;
     switch ((*line).data_format) {
         case LIT_BOOLEAN:
+            toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 2);
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown boolean\n", pos);
@@ -263,6 +262,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_DURATION:
+            toUpperCase((*line).str);
             resultfn = parse_time_duration(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown duration\n", pos);
@@ -272,6 +272,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_DATE:
+            toUpperCase((*line).str);
             resultfn = parse_calendar_date(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown calendar date(%d)\n", pos, resultfn);
@@ -281,6 +282,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_TIME_OF_DAY:
+            toUpperCase((*line).str);
             resultfn = parse_time_of_day(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown time of day(%d)\n", pos, resultfn);
@@ -290,6 +292,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_DATE_AND_TIME:
+            toUpperCase((*line).str);
             resultfn = parse_date_and_time(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown date and time(%d)\n", pos, resultfn);
@@ -299,6 +302,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_INTEGER:
+            toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 10);
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer\n", pos);
@@ -309,6 +313,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_REAL:
+            toUpperCase((*line).str);
             if(!strisfloat((*line).str))
                 return -7;
 
@@ -316,6 +321,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_REAL_EXP:
+            toUpperCase((*line).str);
             if (!strisrealexp((*line).str))
                 return -8;
 
@@ -324,6 +330,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_BASE2:
+            toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 2);
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 2\n", pos);
@@ -335,6 +342,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_BASE8:
+            toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 8);
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 8\n", pos);
@@ -346,6 +354,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_BASE16:
+            toUpperCase((*line).str);
             resultfn = str2int(&value, (*line).str, 16);
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown integer base 16\n", pos);
@@ -357,6 +366,7 @@ int parse_value(il_t *line, int pos) {
             break;
 
         case LIT_PHY:
+            toUpperCase((*line).str);
             resultfn = parse_phy(&((*line)));
             if (resultfn != 0) {
                 printf("Line %04d -> error: unknown physical address (%d)\n", pos, resultfn);
@@ -651,7 +661,6 @@ int parse_cal(il_t *line) {
     char *right;
 
     char strline[strlen((*line).str) + 1];
-    //strcpy_s(strline, (*line).str, strlen((*line).str));
     snprintf(strline, strlen((*line).str), "%s", (*line).str);
 
     (*line).data.cal.len = 0;
@@ -682,6 +691,7 @@ int parse_cal(il_t *line) {
         strcpy((*line).data.cal.value[(*line).data.cal.len].str, (*line).str);
 
         char *value;
+        printf("STR: %s\n", (*line).data.cal.value[(*line).data.cal.len].str);
         identify_literal(&((*line).data.cal.value[(*line).data.cal.len]), &value);
         delete_prefixes(&((*line).data.cal.value[(*line).data.cal.len].str));
         int err = parse_value(&((*line).data.cal.value[(*line).data.cal.len]), 0);
