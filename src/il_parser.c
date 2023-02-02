@@ -462,6 +462,9 @@ int parsed2json(parsed_il_t parsed, char **dest) {
     JSON_Value *root_value = json_value_init_object();
     JSON_Object *root_object = json_value_get_object(root_value);
 
+    sprintf(str, "program.lines");
+    json_object_dotset_number(root_object, str, parsed.lines);
+
     for (int pos = 0; pos < parsed.lines; pos++) {
         sprintf(str, "program.%d.%s", pos + 1, "instruction");
         json_object_dotset_string(root_object, str, il_commands_str[parsed.result[pos].code]);
