@@ -686,14 +686,12 @@ program:
             "negate": 0,
             "push": 0,
             "argument": {
-                "datatype_str": "NULL",
-                "dataformat_str": "CAL",
-                "datatype": 0,
-                "dataformat": 14,
                 "function": "FUN_3",
                 "variables": {
                     "var1": {
                         "str": "TIME#1h_15m_30s_60ms",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 1,
                         "value": {
@@ -705,6 +703,8 @@ program:
                     },
                     "PV": {
                         "str": "DATE_AND_TIME#2001-04-09-11:36:15.20",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 19,
                         "dataformat": 4,
                         "value": {
@@ -719,6 +719,8 @@ program:
                     },
                     "CU": {
                         "str": "-12e6",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 6,
                         "value": {
@@ -727,6 +729,8 @@ program:
                     },
                     "DT": {
                         "str": "DATE#2001-04-09",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 2,
                         "value": {
@@ -858,14 +862,12 @@ program:
             "negate": 0,
             "push": 0,
             "argument": {
-                "datatype_str": "NULL",
-                "dataformat_str": "CAL",
-                "datatype": 0,
-                "dataformat": 14,
                 "function": "CTU_1",
                 "variables": {
                     "RESET": {
                         "str": "%IX3.6",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 11,
                         "value": {
@@ -877,6 +879,8 @@ program:
                     },
                     "PVv_5": {
                         "str": "Limit",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 13,
                         "value": {
@@ -885,6 +889,8 @@ program:
                     },
                     "_aCU": {
                         "str": "145",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 5,
                         "value": {
@@ -893,6 +899,8 @@ program:
                     },
                     "_sTR_": {
                         "str": "string",
+                        "datatype_str": "NULL",
+                        "dataformat_str": "CAL",
                         "datatype": 0,
                         "dataformat": 12,
                         "value": {
