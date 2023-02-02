@@ -253,7 +253,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 25
                 }
             }
         },
@@ -326,7 +326,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 25
                 }
             }
         },
@@ -379,7 +379,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 23
                 }
             }
         },
@@ -432,7 +432,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 19
                 }
             }
         },
@@ -505,7 +505,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 9
                 }
             }
         },
@@ -578,7 +578,7 @@ program:
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
-                    "none": 0
+                    "line": 9
                 }
             }
         },
