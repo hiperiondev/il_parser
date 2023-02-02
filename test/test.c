@@ -222,6 +222,7 @@ int main(void) {
     parsed_il_t parsed;
     int lines;
     int pos;
+    char *dest = NULL;
 
     printf("--------------------------------------------\n< START test1 >\n\n");
     lines = compile_il("test.il", &parsed);
@@ -247,8 +248,6 @@ int main(void) {
     }
 
     printf("\n----------\n- JSON -\n----------\n");
-
-    char *dest = NULL;
 
     parsed2json(parsed, &dest);
     printf("\n%s\n", dest);

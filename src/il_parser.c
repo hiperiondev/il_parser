@@ -353,6 +353,7 @@ void free_il(parsed_il_t *il) {
                 free(il->result[n].str);
         }
     }
+
     free(il->result);
 }
 
@@ -440,8 +441,13 @@ void json_values(il_t line, char **dest, char *str2, int pos, JSON_Object **root
             break;
 
         case LIT_NONE:
-            sprintf(str, "%s.%s", str2, "value.none");
-            json_object_dotset_number(root_object, str, 0);
+            if (line.code == IL_JMP) {
+                sprintf(str, "%s.%s", str2, "value.line");
+                json_object_dotset_number(root_object, str, line.data.jmp_addr);
+            } else {
+                sprintf(str, "%s.%s", str2, "value.none");
+                json_object_dotset_number(root_object, str, 0);
+            }
             break;
 
         default:
@@ -472,8 +478,10 @@ int parsed2json(parsed_il_t parsed, char **dest) {
         strremove(str2, "#");
         sprintf(str, "program.%d.%s", pos + 1, "argument.datatype_str");
         json_object_dotset_string(root_object, str, str2);
+        sprintf(str2, lit_dataformat_str[parsed.result[pos].dataformat]);
+        strremove(str2, "LIT_");
         sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat_str");
-        json_object_dotset_string(root_object, str, lit_dataformat_str[parsed.result[pos].dataformat]);
+        json_object_dotset_string(root_object, str, str2);
 
         sprintf(str, "program.%d.%s", pos + 1, "argument.datatype");
         json_object_dotset_number(root_object, str, parsed.result[pos].datatype);
