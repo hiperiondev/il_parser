@@ -189,7 +189,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%I0.0",
@@ -209,7 +209,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%MB0",
@@ -229,7 +229,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M3.0",
@@ -249,7 +249,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -265,7 +265,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "BOOL",
-                "dataformat_str": "LIT_BOOLEAN",
+                "dataformat_str": "BOOLEAN",
                 "datatype": 1,
                 "dataformat": 0,
                 "str": "1",
@@ -282,7 +282,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M1.0",
@@ -302,7 +302,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M3.0",
@@ -322,7 +322,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -338,7 +338,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_INTEGER",
+                "dataformat_str": "INTEGER",
                 "datatype": 0,
                 "dataformat": 5,
                 "str": "450",
@@ -355,7 +355,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M1.0",
@@ -375,7 +375,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -391,7 +391,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "UINT",
-                "dataformat_str": "LIT_INTEGER",
+                "dataformat_str": "INTEGER",
                 "datatype": 6,
                 "dataformat": 5,
                 "str": "A5",
@@ -408,7 +408,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M1.0",
@@ -428,7 +428,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -444,7 +444,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_REAL",
+                "dataformat_str": "REAL",
                 "datatype": 0,
                 "dataformat": 6,
                 "str": "23.6",
@@ -461,7 +461,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M1.0",
@@ -481,7 +481,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M0.0",
@@ -501,7 +501,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -517,7 +517,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_REAL",
+                "dataformat_str": "REAL",
                 "datatype": 0,
                 "dataformat": 6,
                 "str": "-12E-5",
@@ -534,7 +534,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M0.0",
@@ -554,7 +554,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%M1.0",
@@ -574,7 +574,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "value": {
@@ -590,7 +590,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_VAR",
+                "dataformat_str": "VAR",
                 "datatype": 0,
                 "dataformat": 13,
                 "str": "a_Variable_23",
@@ -607,7 +607,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%QW5",
@@ -627,7 +627,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_PHY",
+                "dataformat_str": "PHY",
                 "datatype": 0,
                 "dataformat": 11,
                 "str": "%Q0.0",
@@ -647,7 +647,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "TOD",
-                "dataformat_str": "LIT_TIME_OF_DAY",
+                "dataformat_str": "TIME_OF_DAY",
                 "datatype": 18,
                 "dataformat": 3,
                 "str": "11:36:15.20",
@@ -667,7 +667,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_DURATION",
+                "dataformat_str": "DURATION",
                 "datatype": 0,
                 "dataformat": 1,
                 "str": "1H 15M 30S 60MS",
@@ -687,7 +687,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_CAL",
+                "dataformat_str": "CAL",
                 "datatype": 0,
                 "dataformat": 14,
                 "function": "FUN_3",
@@ -746,7 +746,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_DURATION",
+                "dataformat_str": "DURATION",
                 "datatype": 0,
                 "dataformat": 1,
                 "str": "18MS",
@@ -766,7 +766,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_DATE",
+                "dataformat_str": "DATE",
                 "datatype": 0,
                 "dataformat": 2,
                 "str": "2001-04-09",
@@ -785,7 +785,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "DT",
-                "dataformat_str": "LIT_DATE_AND_TIME",
+                "dataformat_str": "DATE_AND_TIME",
                 "datatype": 19,
                 "dataformat": 4,
                 "str": "2001-04-09-11:36:15.20",
@@ -808,7 +808,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_STRING",
+                "dataformat_str": "STRING",
                 "datatype": 0,
                 "dataformat": 12,
                 "str": "this is a string",
@@ -825,7 +825,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_STRING",
+                "dataformat_str": "STRING",
                 "datatype": 0,
                 "dataformat": 12,
                 "str": "a",
@@ -842,7 +842,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_STRING",
+                "dataformat_str": "STRING",
                 "datatype": 0,
                 "dataformat": 12,
                 "str": "AaBb",
@@ -859,7 +859,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_CAL",
+                "dataformat_str": "CAL",
                 "datatype": 0,
                 "dataformat": 14,
                 "function": "CTU_1",
@@ -910,7 +910,7 @@ program:
             "push": 0,
             "argument": {
                 "datatype_str": "NULL",
-                "dataformat_str": "LIT_NONE",
+                "dataformat_str": "NONE",
                 "datatype": 0,
                 "dataformat": 15,
                 "str": "",
