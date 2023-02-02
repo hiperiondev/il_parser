@@ -500,11 +500,11 @@ int parsed2json(parsed_il_t parsed, char **dest) {
                 sprintf(str, "program.%d.argument.variables.%s.str", pos + 1, parsed.result[pos].data.cal.var[n]);
                 json_object_dotset_string(root_object, str, parsed.result[pos].data.cal.value[n].str);
 
-                sprintf(str2, pfx_iectype[parsed.result[pos].datatype]);
+                sprintf(str2, pfx_iectype[parsed.result[pos].data.cal.value[n].datatype]);
                 strremove(str2, "#");
                 sprintf(str, "program.%d.%s.%s.datatype_str", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
                 json_object_dotset_string(root_object, str, str2);
-                sprintf(str2, lit_dataformat_str[parsed.result[pos].dataformat]);
+                sprintf(str2, lit_dataformat_str[parsed.result[pos].data.cal.value[n].dataformat]);
                 strremove(str2, "LIT_");
                 sprintf(str, "program.%d.%s.%s.dataformat_str", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
                 json_object_dotset_string(root_object, str, str2);
