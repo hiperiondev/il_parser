@@ -181,6 +181,7 @@ program:
 
 {
     "program": {
+        "lines": 36,
         "1": {
             "instruction": "LD",
             "code": 1,
