@@ -1,7 +1,7 @@
 /**
- * @file il_parser.h
+ * @file il_parser.c
  * @brief
- * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
+ * @copyright 2023 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
  * @note This is based on other projects. Please contact their authors for more information.
  *
@@ -28,13 +28,13 @@
  *
  */
 
-#ifndef IL_H_
-#define IL_H_
+#ifndef IL_PARSER_H_
+#define IL_PARSER_H_
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "internal_parser.h"
+#include "strings.h"
 
 #define DEBUG
 
@@ -45,10 +45,7 @@
     #define DBG_PRINT(fmt, args...)
 #endif
 
-extern const char *il_commands_str[];
-extern const char *lit_dataformat_str[];
-
-enum IL_COMMANDS {
+typedef enum COMMANDS {
 //   instr  //       | modifiers |  description
     IL_NOP, //  0x00 |           |  Not operation
     IL_LD,  //  0x01 |     N     |  Loads the (negated) the value of the operand into the accumulator.
@@ -82,9 +79,9 @@ enum IL_COMMANDS {
     IL_1D,  //  0x1d |           |  not defined.
     IL_1E,  //  0x1e |           |  not defined.
     IL_END  //  0x1f |           |  Program end.
-};
+} il_commands_t;
 
-enum DATAFORMAT {
+typedef enum DATAFORMAT {
     LIT_BOOLEAN,       // 0x00
     LIT_DURATION,      // 0x01
     LIT_DATE,          // 0x02
@@ -102,16 +99,16 @@ enum DATAFORMAT {
     LIT_CAL,           // 0x0e
     /* ... */
     LIT_NONE
-};
+} il_dataformat_t;
 
-enum IEC_TYPE {
+typedef enum DATATYPE {
     IEC_T_NULL    = 0x00, // not value
     IEC_T_BOOL    = 0x01, // bool
     IEC_T_SINT    = 0x02, // int8_t
     IEC_T_USINT   = 0x03, // uint8_t
     IEC_T_BYTE    = 0x04, // uint8_t
-    IEC_T_INT     = 0x05, // int16_t
-    IEC_T_UINT    = 0x06, // uint16_t
+    IEC_T_UINT    = 0x05, // uint16_t
+    IEC_T_INT     = 0x06, // int16_t
     IEC_T_WORD    = 0x07, // uint16_t
     IEC_T_DINT    = 0x08, // int32_t
     IEC_T_UDINT   = 0x09, // uint32_t
@@ -137,71 +134,89 @@ enum IEC_TYPE {
     IEC_T_TIMER   = 0x1d, // timer_t
     IEC_T_VAR     = 0x1e, // variable
     IEC_T_PHY     = 0x1f, // physical address
-};
+} il_datatype_t;
 
-enum PHY_PREFIX {
-    PHY_I,   //
-    PHY_Q,   //
-    PHY_M,   //
-    PHY_NONE //
-};
+typedef enum PHY_PREFIX {
+    PHY_P_I,   //
+    PHY_P_Q,   //
+    PHY_P_M,   //
+    PHY_P_NONE //
+} il_phy_prefix_t;
 
-enum PHY_DATA_TYPE {
-    PHY_BIT,   //
-    PHY_BYTE,  //
-    PHY_WORD,  //
-    PHY_DOUBLE //
-};
+typedef enum PHY_DATATYPE {
+    PHY_D_BIT,    //
+    PHY_D_BYTE,   //
+    PHY_D_WORD,   //
+    PHY_D_DOUBLE, //
+} il_phy_datatype_t;
 
 typedef struct il il_t;
 struct il {
-             char *str;         //
-          uint8_t code;         // IL code
-             bool c;            // conditional
-             bool n;            // negate
-             bool p;            // push '('
-          uint8_t datatype;    //
-          uint8_t dataformat;  //
+      il_commands_t code;               // IL code
+               bool c;                  // conditional
+               bool n;                  // negate
+               bool p;                  // push '('
+      il_datatype_t iec_datatype;       //
+    il_dataformat_t lit_dataformat;     //
     union {
-          double real;          //
-        uint32_t jmp_addr;      //
-        uint64_t uinteger;      //
-         int64_t integer;       //
+            bool boolean;
+          String str;                   //
+          double real;                  //
+        uint32_t jmp_addr;              //
+         int64_t integer;               //
         struct {
-            uint16_t len;       //
-                char *func;     //
-                char **var;     //
-                il_t *value;    //
-        } cal;                  //
+              il_phy_prefix_t prefix;   //
+            il_phy_datatype_t datatype; //
+            union {
+                    struct {
+                     uint32_t phy_a;    //
+                     uint32_t phy_b;    //
+                    } bit;              //
+                     uint8_t byte;      //
+                    uint16_t word;      //
+                      double dbl;       //
+            } data;                     //
+        } phy;                          //
         struct {
-             uint8_t prefix;    //
-             uint8_t datatype;  //
-            uint32_t phy_a;     //
-            uint32_t phy_b;     //
-        } phy;                  //
+            uint8_t msec;               //
+            uint8_t sec;                //
+            uint8_t min;                //
+            uint8_t hour;               //
+        } tod;                          //
+        struct {
+             uint8_t day;               //
+             uint8_t month;             //
+            uint16_t year;              //
+        } date;
         struct {
             struct {
-                 uint8_t day;   //
-                 uint8_t month; //
-                uint16_t year;  //
-            } date;             //
+                 uint8_t day;           //
+                 uint8_t month;         //
+                uint16_t year;          //
+            } date;                     //
             struct {
-                 uint8_t msec;  //
-                 uint8_t sec;   //
-                 uint8_t min;   //
-                 uint8_t hour;  //
-            } tod;              //
-        } dt;                   //
-    } data;                     //
+                uint8_t msec;           //
+                uint8_t sec;            //
+                uint8_t min;            //
+                uint8_t hour;           //
+            } tod;                      //
+        } dt;                           //
+        struct {
+            uint32_t len;               //
+              String func;              //
+              String *var;              //
+                il_t *value;            //
+        } cal;                          //
+    } data;                             //
 };
 
 typedef struct {
          int lines;   //
-        il_t *result; //
+        il_t **result; //
 } parsed_il_t;
 
- int compile_il(char *file, parsed_il_t *parsed);
-void free_il(parsed_il_t *il);
-int parsed2json(parsed_il_t parsed, char **dest);
+void parse_file_il(char *file, parsed_il_t *parsed);
+void free_il(il_t **il);
 
-#endif /* IL_H_ */
+#endif /* IL_PARSER_H_ */
+

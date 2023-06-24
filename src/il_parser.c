@@ -1,7 +1,7 @@
 /**
  * @file il_parser.c
  * @brief
- * @copyright 2022 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
+ * @copyright 2023 Emiliano Augusto Gonzalez (hiperiondev). This project is released under MIT license. Contact: egonzalez.hiperion@gmail.com
  * @see Project Site: https://github.com/hiperiondev/il_parser
  * @note This is based on other projects. Please contact their authors for more information.
  *
@@ -30,37 +30,27 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #include "il_parser.h"
 #include "strings.h"
-#include "internal_parser.h"
-#include "parson.h"
 
-#define ELEMENT_END(v)         \
-            (v).str = NULL;    \
-            (v).c = 0;         \
-            (v).n = 0;         \
-            (v).p = 0;         \
-            (v).code = IL_END;
-
-typedef struct {
-        char *str; //
-     uint8_t code; //
-        bool c;    // conditional
-        bool n;    // negate
-        bool p;    // push '('
+typedef struct il_str_s {
+    const char *str; //
+       uint8_t code; //
+          bool c;    // conditional
+          bool n;    // negate
+          bool p;    // push '('
 } il_str_t;
 
-typedef struct {
-    char label[512]; //
+typedef struct il_label_s {
+    String label; //
     uint32_t line;   //
-} label_t;
+} il_label_t;
 
-il_str_t commands[55] = {
+static const il_str_t commands[] = {
 //  STR_CMD, CODE  , C, N, P
   { "LD"   , IL_LD , 0, 0, 0 },
   { "LDN"  , IL_LD , 0, 1, 0 },
@@ -117,44 +107,45 @@ il_str_t commands[55] = {
   { "RETCN", IL_RET, 1, 1, 0 },
   { "RETNC", IL_RET, 1, 1, 0 },
   { ")"    , IL_POP, 0, 0, 0 },
+  { ""     , IL_END, 0, 0, 0 },
 };
 
-const char *il_commands_str[] = {
-        "NOP", //
-        "LD",  //
-        "ST",  //
-        "S",   //
-        "R",   //
-        "AND", //
-        "OR",  //
-        "XOR", //
-        "NOT", //
-        "ADD", //
-        "SUB", //
-        "MUL", //
-        "DIV", //
-        "GT",  //
-        "GE",  //
-        "EQ",  //
-        "NE",  //
-        "LE",  //
-        "LT",  //
-        "JMP", //
-        "CAL", //
-        "RET", //
-        "POP", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "???", //
-        "END", //
+static const char *il_commands_str[] = {
+        "NOP", // 0x00
+        "LD",  // 0x01
+        "ST",  // 0x02
+        "S",   // 0x03
+        "R",   // 0x04
+        "AND", // 0x05
+        "OR",  // 0x06
+        "XOR", // 0x07
+        "NOT", // 0x08
+        "ADD", // 0x09
+        "SUB", // 0x0a
+        "MUL", // 0x0b
+        "DIV", // 0x0c
+        "GT",  // 0x0d
+        "GE",  // 0x0e
+        "EQ",  // 0x0f
+        "NE",  // 0x10
+        "LE",  // 0x11
+        "LT",  // 0x12
+        "JMP", // 0x13
+        "CAL", // 0x14
+        "RET", // 0x15
+        "POP", // 0x16
+        "???", // 0x17
+        "???", // 0x18
+        "???", // 0x19
+        "???", // 0x1a
+        "???", // 0x1b
+        "???", // 0x1c
+        "???", // 0x1d
+        "???", // 0x1e
+        "END", // 0x1f
 };
 
-const char *lit_dataformat_str[] = {
+static const char *lit_dataformat_str[] = {
     "LIT_BOOLEAN",       // 0x00
     "LIT_DURATION",      // 0x01
     "LIT_DATE",          // 0x02
@@ -170,359 +161,967 @@ const char *lit_dataformat_str[] = {
     "LIT_STRING",        // 0x0d
     "LIT_VAR",           // 0x0e
     "LIT_CAL",           // 0x0f
-    "LIT_NONE"           //
+    "LIT_NONE"           // 0x10
 };
 
-//////////////////////////////////
+static const char *pfx_dataformat[] = {
+    "2#",            // 0
+    "BOOL#",         // 1
+    "8#",            // 2
+    "16#",           // 3
+    "TOD#",          // 4
+    "DATE_AND_TIME#",// 5
+    "DATE#",         // 6
+    "TIME_OF_DAY#",  // 7
+    "TIME#",         // 8
+    "DT#",           // 9
+    "T#",            // 10
+    "D#",            // 11
+    "PHY#"           // 12
+};
 
-int compile_il(char *file, parsed_il_t *parsed) {
-    uint8_t datatype, dataformat;
+static const uint8_t literal_format[]= {
+    LIT_BASE2,         // 0
+    LIT_BOOLEAN,       // 1
+    LIT_BASE8,         // 2
+    LIT_BASE16,        // 3
+    LIT_TIME_OF_DAY,   // 4
+    LIT_DATE_AND_TIME, // 5
+    LIT_DATE,          // 6
+    LIT_TIME_OF_DAY,   // 7
+    LIT_DURATION,      // 8
+    LIT_DATE_AND_TIME, // 9
+    LIT_DURATION,      // 10
+    LIT_DATE,          // 11
+    LIT_PHY,           // 12
+};
+
+static const char *pfx_iectype[] = {
+    "NULL#",    // 0
+    "BOOL#",    //
+    "SINT#",    //
+    "USINT#",   //
+    "BYTE#",    //
+    "UINT#",    //
+    "INT#",     //
+    "WORD#",    //
+    "DINT#",    //
+    "UDINT#",   //
+    "DWORD#",   //
+    "LINT#",    //
+    "ULINT#",   //
+    "LWORD#",   //
+    "REAL#",    //
+    "LREAL#",   //
+    "TIME#",    //
+    "DATE#",    //
+    "TOD#",     //
+    "DT#",      //
+    "CHAR#",    //
+    "WCHAR#",   //
+    "STRING#",  //
+    "WSTRING#", //
+    "POINTER#", //
+    "TABLE#",   //
+    "USER#",    //
+    "R_EDGE#",  //
+    "F_EDGE#",  //
+    "TIMER#",   //
+    "VAR#",     //
+    "PHY#"      // 31
+};
+
+static const char phy_prefix_c[] = {
+    'I', //
+    'Q', //
+    'M', //
+};
+
+static const char phy_data_type_c[] = {
+    'X', //
+    'B', //
+    'W', //
+    'D', //
+};
+
+/////////////// load and conditioning functions ///////////////
+
+static int find_labels(il_label_t **il_labels, String **program, int program_lines) {
+    uint32_t index, pos = 0, labels_qty = 0;
+
+    *il_labels = calloc(1, sizeof(il_label_t));
+
+    DBG_PRINT("[LABELS]\n");
+    for (uint32_t pc = 0; pc < program_lines; pc++) {
+        if ((index = string_find_c((*program)[pc], ":", 0)) == STR_ERROR)
+            continue;
+        if ((*program)[pc]->data[index + 1] != ' ')
+            continue;
+        *il_labels = realloc(*il_labels, (pos + 1) * sizeof(il_label_t));
+
+        (*il_labels)[pos].label = string_left((*program)[pc], index - 1);
+        (*il_labels)[pos].line = pc;
+
+        DBG_PRINT("    [%s line: %d]\n", (*il_labels)[pos].label->data, (*il_labels)[pos].line);
+
+        string_delete_m((*program)[pc], 0, index);
+        string_trim_m((*program)[pc]);
+
+        ++pos;
+        ++labels_qty;
+    }
+    DBG_PRINT("\n");
+
+    return labels_qty;
+}
+
+static void delete_comments(String **program, int program_lines) {
+    uint32_t index1 = 0, index2 = 0;
+
+    for (uint32_t pc = 0; pc < program_lines; pc++) {
+        if ((index1 = string_find_c((*program)[pc], ";", 0)) != STR_ERROR) {
+            string_delete_m((*program)[pc], index1, (*program)[pc]->length);
+        }
+
+        while((index1 = string_find_c((*program)[pc], "(*", 0)) != STR_ERROR) {
+            if((index2 = string_find_c((*program)[pc], "*)", 0)) == STR_ERROR){
+                printf("ERROR: unfinished comment! [%s]\n", (*program)[pc]->data);
+                exit(1);
+            }
+
+            string_delete_m((*program)[pc], index1, index2 + 1);
+        }
+
+        string_trim_m((*program)[pc]);
+    }
+}
+
+static void sustitute_labels(il_label_t **il_labels, int labels_qty, String **program, int program_lines) {
+    uint32_t index = 0;
+    char buffer[16];
+
+    for (int pc = 0; pc < program_lines; pc++) {
+        String left = string_left((*program)[pc], string_find_c((*program)[pc], " ", 0) - 1);
+        string_toupper_m(left);
+        if (
+                !string_equals_c((*program)[pc], "JMP")   ||
+                !string_equals_c((*program)[pc], "JMPC")  ||
+                !string_equals_c((*program)[pc], "JMPCN") ||
+                !string_equals_c((*program)[pc], "JMPNC")
+        ) {
+            for (uint32_t lbl = 0; lbl < labels_qty; lbl++) {
+                String right = string_right((*program)[pc], string_find_c((*program)[pc], " ", 0) + 1);
+                if (string_equals(right, (*il_labels)[lbl].label)) {
+                    index = string_find((*program)[pc], (*il_labels)[lbl].label, 0);
+                    sprintf(buffer, "%d", (*il_labels)[lbl].line);
+                    string_replace_c_m((*program)[pc], (*il_labels)[lbl].label->data, buffer, index);
+                }
+
+                free(right);
+            }
+        }
+        free(left);
+    }
+}
+
+static void sustitute_others(String **program, int program_lines) {
+    for (uint32_t pc = 0; pc < program_lines; pc++) {
+        uint32_t spc = string_find_c((*program)[pc], " ", 0);
+        String left = string_left((*program)[pc], spc - 1);
+        String right = string_right((*program)[pc], spc + 1);
+        // opcodes to upper
+        string_toupper_m(left);
+
+        // physical address
+        string_replace_c_m(right, "%", "PHY#", 0);
+
+        //end
+        string_reset((*program)[pc]);
+        String sp = string_new_c(" ");
+        string_move(&(*program)[pc], &left);
+        string_concat_m((*program)[pc], sp);
+        string_concat_m((*program)[pc], right);
+        free(sp);
+        free(right);
+    }
+}
+
+static int load_file(char *file, String **program) {
     FILE *f;
-    char line[512];
-    char *ln = NULL, *str_tmp = NULL;
-    char *ptr;
-    int index, pc = 0, pos = 0, labels_qty, err;
-    label_t *labels;
-    char *left = NULL, *right = NULL;
-    int lines = 1;
-    il_t *line_parsed = parsed->result;
-    line_parsed = calloc(1, sizeof(il_t));
-    line_parsed[0].code = IL_END;
+    uint32_t lines = 0;
+    char *line_buf = NULL;
+    size_t line_buf_size = 0;
+    size_t line_size;
+    String linebf;
 
-    labels = calloc(1, sizeof(label_t));
-    labels_qty = 0;
     f = fopen(file, "r");
     if (f == NULL) {
         DBG_PRINT("Error: can't open file\n");
         exit(1);
     }
+    printf("FILE: %s\n", file);
+    *program = malloc(sizeof(String));
 
-    DBG_PRINT("<START>\n");
-
-// first pass: localize labels
-    DBG_PRINT("labels:\n");
-    while (fgets(line, 512, f)) {
-        if (isBlank(line))
+    while ((line_size = getline(&line_buf, &line_buf_size, f) >= 0)) {
+        linebf = string_new_c(line_buf);
+        if (string_isblank(linebf)) {
+            free (linebf);
             continue;
+        }
+        string_trim_m(linebf);
 
-        ptr = strchr(line, ':');
-        pc++;
-        if (ptr == NULL || *(ptr + 1) != ' ')
-            continue;
-
-        index = ptr - line;
-        memcpy(labels[pos].label, line, index);
-        labels_qty++;
-        labels[pos].line = pc;
-        DBG_PRINT("[%04d] %s:\n", labels[pos].line, labels[pos].label);
-        ++pos;
-
-        labels = realloc(labels, (pos + 1) * sizeof(label_t));
+        *program = realloc(*program, (lines + 1) * sizeof(String));
+        (*program)[lines++] = linebf;
     }
 
-    if (labels_qty == 0)
-        DBG_PRINT("[none]\n");
-    DBG_PRINT("\n");
+    free(line_buf);
+    fclose(f);
 
-    rewind(f);
-    pc = 0;
-
-// second pass: compile
-    DBG_PRINT("program:\n");
-    while (fgets(line, 512, f)) {
-        if (isBlank(line))
-            continue;
-        pc++;
-
-        // erase label
-        ptr = strchr(line, ':');
-        if (ptr != NULL && *(ptr + 1) == ' ') {
-            index = ptr - line;
-            memcpy(line, ptr + 1, strlen(line) - index);
-        }
-
-        // erase comment
-        replacestr(line, "(*", ";");
-        ptr = strchr(line, ';');
-        if (ptr != NULL) {
-            index = ptr - line;
-            line[index] = '\0';
-        }
-
-        replace(line, 0x27, 0x22);
-        ln = trim(line);
-        DBG_PRINT("  [%04d] %s\n", pc, ln);
-
-        // parse command
-        split2(ln, ' ', &left, &right);
-        str_tmp = trim(left);
-        toUpperCase(str_tmp);
-        index = 255;
-        for (pos = 0; pos < 55; pos++) {
-            if (!strcmp(str_tmp, commands[pos].str)) {
-                index = pos;
-                break;
-            }
-        }
-        if (index == 255) {
-            printf("[%s]\nerror: command not found or malformed\n", str_tmp);
-            exit(1);
-        }
-
-        // labels in JMP
-        if (commands[index].code == IL_JMP) {
-            for (pos = 0; pos < labels_qty; pos++) {
-                if (!strcmp(labels[pos].label, right)) {
-                    line_parsed[lines - 1].data.jmp_addr = labels[pos].line;
-                    break;
-                }
-            }
-            if (line_parsed[lines - 1].data.jmp_addr == 0) {
-                printf("\nerror: label not exist\n%s\n", ln);
-                exit(1);
-            }
-        }
-
-        line_parsed[lines - 1].code = commands[index].code;
-        line_parsed[lines - 1].c = commands[index].c;
-        line_parsed[lines - 1].n = commands[index].n;
-        line_parsed[lines - 1].p = commands[index].p;
-        if (line_parsed[lines - 1].code != IL_JMP && line_parsed[lines - 1].code != IL_POP && line_parsed[lines - 1].code != IL_S
-                && line_parsed[lines - 1].code != IL_R) {
-            line_parsed[lines - 1].str = calloc((strlen(str_tmp) + 1), sizeof(char));
-            str_tmp = trim(right);
-            memcpy(line_parsed[lines - 1].str, str_tmp, strlen(str_tmp));
-            line_parsed[lines - 1].str[strlen(str_tmp)] = '\0';
-        }
-
-        line_parsed = realloc(line_parsed, ++lines * sizeof(il_t));
-        ELEMENT_END(line_parsed[lines - 1]);
-    }
-
-    // third pass: evaluate arguments
-    DBG_PRINT("\n> identify literals\n");
-    for (pos = 0; pos < lines; pos++) {
-        datatype = IEC_T_NULL;
-        dataformat = LIT_NONE;
-
-        if (line_parsed[pos].str == NULL || line_parsed[pos].code == IL_JMP) {
-            line_parsed[pos].datatype = datatype;
-            line_parsed[pos].dataformat = dataformat;
-            continue;
-        }
-
-        if(line_parsed[pos].code == IL_CAL){
-            line_parsed[pos].dataformat = LIT_CAL;
-            continue;
-        }
-
-        char *value;
-        identify_literal(&(line_parsed[pos]), &value);
-
-        free(line_parsed[pos].str);
-        line_parsed[pos].str = calloc(strlen(value) + 1, sizeof(char));
-        memcpy(line_parsed[pos].str, value, strlen(value));
-        free(value);
-    }
-
-    DBG_PRINT("> parse values\n");
-    for (pos = 0; pos < lines; pos++) {
-        err = parse_value(&(line_parsed[pos]), pos);
-        if (err != 0)
-            exit(1);
-    }
-
-    line_parsed[lines - 1].str = calloc(1, sizeof(char));
-    parsed->result = line_parsed;
-    parsed->lines = lines;
     return lines;
 }
 
-void free_il(parsed_il_t *il) {
-    for (int n = 0; n < il->lines; n++) {
-        if (il->result[n].dataformat == LIT_CAL) {
-            for (int m = 0; m < il->result[n].data.cal.len; m++) {
-                free(il->result[n].data.cal.var[m]);
-                free(il->result[n].data.cal.value[m].str);
-            }
-            free(il->result[n].data.cal.func);
-            free(il->result[n].data.cal.var);
-            free(il->result[n].data.cal.value);
-        } else {
-            if (il->result[n].str != NULL)
-                free(il->result[n].str);
+///////////////////////////////////////////////////////////////
+
+/////////////////////// parse data types //////////////////////
+
+static uint32_t identify_lit_dataformat(String value) {
+    for (uint32_t n = 0; n < 13; n++) {
+        if (string_find_c(value, pfx_dataformat[n], 0) != STR_ERROR) {
+            return literal_format[n];
         }
     }
 
-    free(il->result);
+    if ((value->data[0] == '"' && value->data[value->length - 1] == '"') || (value->data[0] == '\'' && value->data[value->length - 1] == '\''))
+        return LIT_STRING;
+
+    if(string_isinteger(value))
+        return LIT_INTEGER;
+
+    if(string_isfloat(value))
+        return LIT_REAL;
+
+    if (string_isrealexp(value))
+        return LIT_REAL_EXP;
+
+    if ((value->data[0] == 95 || isalpha(value->data[0])) && string_isalnum(value, 0, true))
+        return LIT_VAR;
+
+    return LIT_NONE;
 }
 
-void json_values(il_t line, char **dest, char *str2, int pos, JSON_Object **root) {
-    JSON_Object *root_object = *root;
-    char str[2048];
+static uint32_t identify_iec_datatype(String value) {
+    for (uint32_t n = 0; n < 32; n++) {
+        if (string_find_c(value, pfx_iectype[n], 0) != STR_ERROR) {
+            return n;
+        }
+    }
 
-    switch (line.dataformat) {
+    return IEC_T_NULL;
+}
+
+/////////////////////// parse values //////////////////////////
+static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **result);
+
+static void parse_phy(String value, il_t **result) {
+    String l,r;
+    uint8_t a = 0, b = 0;
+    uint16_t w;
+    double d;
+
+    (*result)->data.phy.data.bit.phy_a = 0;
+    (*result)->data.phy.data.bit.phy_b = 0;
+    (*result)->data.phy.data.byte = 0;
+    (*result)->data.phy.data.word = 0;
+    (*result)->data.phy.data.dbl = 0;
+
+    (*result)->data.phy.prefix = PHY_P_NONE;
+    (*result)->data.phy.datatype = PHY_D_BIT;
+
+    for (uint32_t n = 0; n <= PHY_P_M; n++) {
+        if (value->data[0] == phy_prefix_c[n]) {
+            value->data[0] = ' ';
+            (*result)->data.phy.prefix = n;
+            break;
+        }
+    }
+    if ((*result)->data.phy.prefix == PHY_P_NONE) {
+        printf("ERROR: data prefix illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+    for (uint32_t n = 0; n <= PHY_D_DOUBLE; n++) {
+        if (value->data[1] == phy_data_type_c[n]) {
+            value->data[1] = ' ';
+            (*result)->data.phy.datatype = n;
+            break;
+        }
+    }
+
+    string_trim_m(value);
+
+    switch ((*result)->data.phy.datatype) {
+        case PHY_D_BIT:
+            if ((l = string_split(value, ".", &r)) == NULL) {
+                printf("ERROR: phy bit format illegal! [%s]\n", value->data);
+                exit(1);
+            }
+
+            if (string_issigned(l) || string_issigned(r)) {
+                printf("ERROR: phy bit illegal (number signed)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            if ((a = string_tolong(l, 10)) != string_tolong(l, 10) || (b = string_tolong(r, 10)) != string_tolong(r, 10)) {
+                printf("ERROR: phy bit illegal (number not byte)(a: %d[%s], b: %d[%s])! [%s]\n", a, l->data, b, r->data, value->data);
+                exit(1);
+            }
+
+            (*result)->data.phy.data.bit.phy_a = a;
+            (*result)->data.phy.data.bit.phy_b = b;
+
+            free(l);
+            free(r);
+
+            break;
+        case PHY_D_BYTE:
+            if (string_issigned(value)) {
+                printf("ERROR: phy byte illegal (number signed)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            if ((a = string_tolong(value, 10)) != string_tolong(value, 10)) {
+                printf("ERROR: phy byte illegal (number not byte)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            (*result)->data.phy.data.byte = a;
+
+            break;
+        case PHY_D_WORD:
+            if (string_issigned(value)) {
+                printf("ERROR: phy word illegal (number signed)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            if ((w = string_tolong(value, 10)) != string_tolong(value, 10)) {
+                printf("ERROR: phy word illegal (number not word)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            (*result)->data.phy.data.byte = w;
+
+            break;
+        case PHY_D_DOUBLE:
+            if ((d = string_todouble(value)) != string_todouble(value)) {
+                printf("ERROR: phy float illegal (number not float)! [%s]\n", value->data);
+                exit(1);
+            }
+
+            (*result)->data.phy.data.dbl = d;
+
+            break;
+    }
+}
+
+static void parse_string(String value, il_t **result) {
+    value->data[0] = ' ';
+    value->data[value->length - 1] = ' ';
+    string_trim_m(value);
+    (*result)->data.str = string_new_c(value->data);
+}
+
+static void parse_boolean(String value, il_t **result) {
+    if (string_equals_c(value, "0") || string_equals_c(value, "FALSE"))
+        (*result)->data.boolean = 0;
+    else if (string_equals_c(value, "1") || string_equals_c(value, "TRUE"))
+        (*result)->data.boolean = 1;
+    else {
+        printf("ERROR: boolean illegal! [%s]\n", value->data);
+        exit(1);
+    }
+}
+
+static void parse_duration(String value, il_t **result) {
+    uint32_t pos = 0;
+
+    const char *pf[4] = { "H", "M", "S", "L" };
+    uint8_t *vl[4] = {
+            &((*result)->data.tod.hour),
+            &((*result)->data.tod.min),
+            &((*result)->data.tod.sec),
+            &((*result)->data.tod.msec)
+    };
+
+    string_replace_c_m(value, "MS", "L", 0);
+
+    for (uint32_t n = 0; n < 4; n++) {
+        if ((pos = string_find_c(value, pf[n], 0)) != STR_ERROR) {
+            String val = string_left(value, pos - 1);
+            if (!string_isinteger(val) || string_issigned(val)) {
+                printf("ERROR: duration illegal! [%s]\n", val->data);
+                exit(1);
+            }
+
+            if ((*vl[n] = string_tolong(val, 10)) != string_tolong(val, 10)) {
+                printf("ERROR: duration illegal (number too long)! [%s]\n", val->data);
+                exit(1);
+            }
+
+            string_right_m(value, pos + 1);
+
+            free(val);
+        } else
+            *vl[n] = 0;
+    }
+}
+
+static void parse_time_of_day(String value, il_t **result) {
+    uint32_t pos;
+    String v, tmp;
+
+    if ((pos = string_find_c(value, ":", 0)) == STR_ERROR) {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    v = string_left(value, pos - 1);
+    if (!string_isinteger(v)
+            || string_issigned(v)
+            || (((*result)->data.tod.hour = string_tolong(v, 10)) != string_tolong(v, 10))
+            || (*result)->data.tod.hour > 23)
+    {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    free(v);
+    string_right_m(value, pos + 1);
+
+    if ((pos = string_find_c(value, ":", 0)) == STR_ERROR) {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    v = string_left(value, pos - 1);
+    if (!string_isinteger(v)
+            || string_issigned(v)
+            || (((*result)->data.tod.min = string_tolong(v, 10)) != string_tolong(v, 10))
+            || (*result)->data.tod.min > 59)
+    {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    free(v);
+    string_right_m(value, pos + 1);
+
+    if (!string_isfloat(value)
+                || string_issigned(value)
+                || string_todouble(value) > 59.999)
+        {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    } else {
+        if (string_isinteger(value)) {
+            (*result)->data.tod.sec = string_tolong(value, 10);
+            (*result)->data.tod.msec = 0;
+        } else {
+            tmp = string_left(value, string_find_c(value, ".", 0) - 1);
+            (*result)->data.tod.sec = string_tolong(tmp, 10);
+            free(tmp);
+            tmp = string_right(value, string_find_c(value, ".", 0) + 1);
+            (*result)->data.tod.msec = string_tolong(tmp, 10);
+            free(tmp);
+        }
+    }
+}
+
+static void parse_date(String value, il_t **result) {
+    uint32_t pos;
+    String v;
+
+    if ((pos = string_find_c(value, "-", 0)) == STR_ERROR) {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    v = string_left(value, pos - 1);
+    if (!string_isinteger(v)
+            || string_issigned(v)
+            || (((*result)->data.date.year = string_tolong(v, 10)) != string_tolong(v, 10))
+            || (*result)->data.date.year < 1)
+    {
+        printf("ERROR: date illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    free(v);
+    string_right_m(value, pos + 1);
+
+    if ((pos = string_find_c(value, "-", 0)) == STR_ERROR) {
+        printf("ERROR: time of day illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    v = string_left(value, pos - 1);
+    if (!string_isinteger(v)
+            || string_issigned(v)
+            || (((*result)->data.date.month = string_tolong(v, 10)) != string_tolong(v, 10))
+            || (*result)->data.date.month > 12 || (*result)->data.date.month < 1)
+    {
+        printf("ERROR: date illegal! [%s]\n", value->data);
+        exit(1);
+    }
+    free(v);
+    string_right_m(value, pos + 1);
+
+    if (!string_isinteger(value)
+            || string_issigned(value)
+            || (((*result)->data.date.day = string_tolong(value, 10)) != string_tolong(value, 10))
+            || (*result)->data.date.day > 31
+            || (*result)->data.date.day < 1)
+    {
+        printf("ERROR: date illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+
+}
+
+static void parse_date_and_time(String value, il_t **result) {
+    if (value->data[10] != '-') {
+        printf("ERROR: date and time illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+    il_t *val = malloc(sizeof(il_t));
+    String vl;
+
+    vl = string_left(value, 9);
+    parse_date(vl, &val);
+    (*result)->data.dt.date.year = val->data.date.year;
+    (*result)->data.dt.date.month = val->data.date.month;
+    (*result)->data.dt.date.day = val->data.date.day;
+    free(vl);
+
+    vl = string_right(value, 11);
+    parse_time_of_day(vl, &val);
+    (*result)->data.dt.tod.hour = val->data.tod.hour;
+    (*result)->data.dt.tod.min = val->data.tod.min;
+    (*result)->data.dt.tod.sec = val->data.tod.sec;
+    (*result)->data.dt.tod.msec = val->data.tod.msec;
+    free(vl);
+
+    free(val);
+}
+
+static void parse_integer(String value, il_t **result) {
+    if (!string_isinteger(value)) {
+        printf("ERROR: integer illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+    if (((*result)->data.integer = string_tolong(value, 10)) != string_tolong(value, 10)) {
+        printf("ERROR: integer illegal! [%s]\n", value->data);
+        exit(1);
+    }
+}
+
+static void parse_real(String value, il_t **result) {
+    if (!string_isfloat(value)) {
+        printf("ERROR: real illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+    if (((*result)->data.real = string_todouble(value)) != string_todouble(value)) {
+        printf("ERROR: real illegal! [%s]\n", value->data);
+        exit(1);
+    }
+}
+
+static void parse_real_exp(String value, il_t **result) {
+    uint8_t type = string_isrealexp(value);
+    if (type == 0) {
+        printf("ERROR: real exp illegal! [%s]\n", value->data);
+        exit(1);
+    }
+
+    if (((*result)->data.real = string_todouble(value)) != string_todouble(value)) {
+        printf("ERROR: real exp illegal! [%s]\n", value->data);
+        exit(1);
+    }
+}
+
+static void parse_base(String value, il_t **result) {
+    string_right_m(value, string_find_c(value, "#", 0) + 1);
+    printf("value: [%s](%d)\n", value->data, (int)string_tolong(value, 16));
+    switch ((*result)->lit_dataformat) {
+        case LIT_BASE2:
+            if (((*result)->data.integer = string_tolong(value, 2)) != string_tolong(value, 2)) {
+                printf("ERROR: integer illegal! [%s]\n", value->data);
+                exit(1);
+            }
+            break;
+        case LIT_BASE8:
+            if (((*result)->data.integer = string_tolong(value, 8)) != string_tolong(value, 8)) {
+                printf("ERROR: integer illegal! [%s]\n", value->data);
+                exit(1);
+            }
+            break;
+        case LIT_BASE16:
+            string_tolower_m(value);
+            if (((*result)->data.integer = string_tolong(value, 16)) != string_tolong(value, 16)) {
+                printf("ERROR: integer illegal! [%s]\n", value->data);
+                exit(1);
+            }
+            break;
+        default:
+            printf("ERROR: base illegal! [%s]\n", value->data);
+            exit(1);
+    }
+}
+
+static void parse_cal(String value, il_t **result) {
+    uint32_t pos;
+
+    pos = string_find_c(value, " ", 0);
+    (*result)->data.cal.func = string_left(value, pos - 1);
+    string_right_m(value, pos + 1);
+    value->data[0] = ' ';
+    string_delete_postfix_c_m(value, ")");
+    string_trim_m(value);
+
+    (*result)->data.cal.len = 0;
+    (*result)->data.cal.value = malloc(sizeof(il_t));
+    (*result)->data.cal.var = malloc(sizeof(String));
+
+    void internal(String pos_var, il_t **result) {
+        uint32_t peq;
+        if ((peq = string_find_c(pos_var, ":=", 0)) == STR_ERROR) {
+            printf("ERROR: cal variable illegal! [%s]\n", value->data);
+            exit(1);
+        }
+
+        (*result)->data.cal.value = realloc((*result)->data.cal.value, ((*result)->data.cal.len + 1) * sizeof(il_t));
+        (*result)->data.cal.var = realloc((*result)->data.cal.var, ((*result)->data.cal.len + 1) * sizeof(String));
+        il_t *cv = &((*result)->data.cal.value[(*result)->data.cal.len]);
+
+        (*result)->data.cal.var[(*result)->data.cal.len] = string_left(pos_var, peq - 1);
+
+        String var_val = string_right(pos_var, peq + 2);
+        (*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat = identify_lit_dataformat(var_val);
+        (*result)->data.cal.value[(*result)->data.cal.len].iec_datatype = identify_iec_datatype(var_val);
+
+        DBG_PRINT("    [ %s (lit_dataformat: %s, iec_datatype: %s) ]\n",
+                     (*result)->data.cal.var[(*result)->data.cal.len]->data,
+                     lit_dataformat_str[(*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat],
+                     pfx_iectype[(*result)->data.cal.value[(*result)->data.cal.len].iec_datatype]
+                 );
+
+        uint32_t spc = string_find_c(var_val, "#", 0);
+        string_right_m(var_val, spc + 1);
+
+        if ((*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat != LIT_STRING
+                && (*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat != LIT_VAR) {
+            string_toupper_m(var_val);
+            while (string_find_c(var_val, "_", 0) != STR_ERROR) {
+                string_delete_c_m(var_val, "_");
+            }
+        }
+
+        parse_literal(var_val, (*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat, &cv);
+
+        ++((*result)->data.cal.len);
+
+        string_right_m(value, pos + 1);
+        string_trim_m(value);
+        free(var_val);
+    }
+
+    while ((pos = string_find_c(value, ",", 0)) != STR_ERROR) {
+        String pos_var = string_left(value, pos -1);
+        internal(pos_var, result);
+        free(pos_var);
+    }
+
+    String pos_var = string_right(value, pos + 1);
+    internal(pos_var, result);
+    free(pos_var);
+}
+
+static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **result) {
+    switch (lit_dataformat) {
         case LIT_BOOLEAN:
-            sprintf(str, "%s.%s.bool", str2, "value");
-            json_object_dotset_number(root_object, str, line.data.integer);
-            break;
+            parse_boolean(value, &((*result)));
+            DBG_PRINT("        [boolean: %d]\n", (*result)->data.boolean);
 
-        case LIT_TIME_OF_DAY:
+            break;
         case LIT_DURATION:
-            sprintf(str, "%s.%s", str2, "value.msec");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.msec);
-            sprintf(str, "%s.%s", str2, "value.sec");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.sec);
-            sprintf(str, "%s.%s", str2, "value.min");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.min);
-            sprintf(str, "%s.%s", str2, "value.hour");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.hour);
-            break;
+            parse_duration(value, &((*result)));
+            DBG_PRINT("        [H: %d, M: %d, S: %d, MS: %d]\n",
+                    (*result)->data.tod.hour,
+                    (*result)->data.tod.min,
+                    (*result)->data.tod.sec,
+                    (*result)->data.tod.msec
+                    );
 
+            break;
         case LIT_DATE:
-            sprintf(str, "%s.%s", str2, "value.day");
-            json_object_dotset_number(root_object, str, line.data.dt.date.day);
-            sprintf(str, "%s.%s", str2, "value.month");
-            json_object_dotset_number(root_object, str, line.data.dt.date.month);
-            sprintf(str, "%s.%s", str2, "value.year");
-            json_object_dotset_number(root_object, str, line.data.dt.date.year);
+            parse_date(value, &((*result)));
+            DBG_PRINT("        [year: %d, month: %d, day: %d]\n",
+                    (*result)->data.date.year,
+                    (*result)->data.date.month,
+                    (*result)->data.date.day
+                    );
             break;
+        case LIT_TIME_OF_DAY:
+            parse_time_of_day(value, &((*result)));
+            DBG_PRINT("        [H: %d, M: %d, S: %d, MS: %d]\n",
+                    (*result)->data.tod.hour, (*result)->data.tod.min,
+                    (*result)->data.tod.sec,
+                    (*result)->data.tod.msec
+                    );
 
+            break;
         case LIT_DATE_AND_TIME:
-            sprintf(str, "%s.%s", str2, "value.msec");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.msec);
-            sprintf(str, "%s.%s", str2, "value.sec");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.sec);
-            sprintf(str, "%s.%s", str2, "value.min");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.min);
-            sprintf(str, "%s.%s", str2, "value.hour");
-            json_object_dotset_number(root_object, str, line.data.dt.tod.hour);
-            sprintf(str, "%s.%s", str2, "value.day");
-            json_object_dotset_number(root_object, str, line.data.dt.date.day);
-            sprintf(str, "%s.%s", str2, "value.month");
-            json_object_dotset_number(root_object, str, line.data.dt.date.month);
-            sprintf(str, "%s.%s", str2, "value.year");
-            json_object_dotset_number(root_object, str, line.data.dt.date.year);
+            parse_date_and_time(value, &((*result)));
+            DBG_PRINT("        [year: %d, month: %d, day: %d, ",
+                    (*result)->data.dt.date.year, (*result)->data.dt.date.month,
+                    (*result)->data.dt.date.day
+                    );
+            DBG_PRINT("H: %d, M: %d, S: %d, MS: %d]\n",
+                    (*result)->data.dt.tod.hour,
+                    (*result)->data.dt.tod.min,
+                    (*result)->data.dt.tod.sec,
+                    (*result)->data.dt.tod.msec
+                    );
             break;
-
-        case LIT_REAL_EXP:
+        case LIT_INTEGER:
+            parse_integer(value, &((*result)));
+            DBG_PRINT("        [integer: %" PRId64 "]\n", (*result)->data.integer);
+            break;
         case LIT_REAL:
-            sprintf(str, "%s.%s", str2, "value.real");
-            json_object_dotset_number(root_object, str, line.data.real);
+            parse_real(value, &((*result)));
+            DBG_PRINT("        [real: %f]\n", (*result)->data.real);
             break;
-
+        case LIT_REAL_EXP:
+            parse_real_exp(value, &((*result)));
+            DBG_PRINT("        [real: %f]\n", (*result)->data.real);
+            break;
         case LIT_BASE2:
         case LIT_BASE8:
         case LIT_BASE16:
-        case LIT_INTEGER:
-            sprintf(str, "%s.%s", str2, "value.integer");
-            json_object_dotset_number(root_object, str, line.data.integer);
+            parse_base(value, &((*result)));
+            DBG_PRINT("        [integer: %" PRId64 "]\n", (*result)->data.integer);
             break;
-
         case LIT_PHY:
-            sprintf(str, "%s.%s", str2, "value.prefix");
-            json_object_dotset_number(root_object, str, line.data.phy.prefix);
-            sprintf(str, "%s.%s", str2, "value.datatype");
-            json_object_dotset_number(root_object, str, line.data.phy.datatype);
-            sprintf(str, "%s.%s", str2, "value.phy_a");
-            json_object_dotset_number(root_object, str, line.data.phy.phy_a);
-            sprintf(str, "%s.%s", str2, "value.phy_b");
-            json_object_dotset_number(root_object, str, line.data.phy.phy_b);
-            break;
-
-        case LIT_STRING:
-            sprintf(str, "%s.%s", str2, "value.string");
-            json_object_dotset_string(root_object, str, line.str);
-            break;
-
-        case LIT_VAR:
-            sprintf(str, "%s.%s", str2, "value.variable");
-            json_object_dotset_string(root_object, str, line.str);
-            break;
-
-        case LIT_NONE:
-            if (line.code == IL_JMP) {
-                sprintf(str, "%s.%s", str2, "value.line");
-                json_object_dotset_number(root_object, str, line.data.jmp_addr);
-            } else {
-                sprintf(str, "%s.%s", str2, "value.none");
-                json_object_dotset_number(root_object, str, 0);
+            parse_phy(value, &((*result)));
+            DBG_PRINT("        [prefix: %d[%c], datatype: %d[%c] ",
+                    (*result)->data.phy.prefix,
+                    phy_prefix_c[(*result)->data.phy.prefix],
+                    (*result)->data.phy.datatype,
+                    phy_data_type_c[(*result)->data.phy.datatype]
+                                    );
+#ifdef DEBUG
+            switch ((*result)->data.phy.datatype) {
+                case PHY_D_BIT:
+                    DBG_PRINT("phy_a: %d, phy_b: %d]\n",
+                            (*result)->data.phy.data.bit.phy_a,
+                            (*result)->data.phy.data.bit.phy_b
+                            );
+                    break;
+                case PHY_D_BYTE:
+                    DBG_PRINT("phy_byte: %d]\n", (*result)->data.phy.data.byte);
+                    break;
+                case PHY_D_WORD:
+                    DBG_PRINT("phy_word: %d]\n", (*result)->data.phy.data.word);
+                    break;
+                case PHY_D_DOUBLE:
+                    DBG_PRINT("phy_double: %f]\n", (*result)->data.phy.data.dbl);
             }
+#endif
+            break;
+        case LIT_STRING:
+            parse_string(value, &((*result)));
+            DBG_PRINT("        [string: %s]\n", (*result)->data.str->data);
+            break;
+        case LIT_VAR:
+            (*result)->data.str = string_new_c(value->data);
+            DBG_PRINT("        [variable: %s]\n", (*result)->data.str->data);
+            break;
+        case LIT_CAL:
+            parse_cal(value, &((*result)));
             break;
 
-        default:
     }
-
-    *root = root_object;
 }
 
-int parsed2json(parsed_il_t parsed, char **dest) {
-    char str[1024], str2[1024];
+///////////////////////////////////////////////////////////////
 
-    JSON_Value *root_value = json_value_init_object();
-    JSON_Object *root_object = json_value_get_object(root_value);
+////////////////////// parse commands /////////////////////////
 
-    sprintf(str, "program.lines");
-    json_object_dotset_number(root_object, str, parsed.lines);
+void parse_command(String line, il_t **result) {
+    String left = NULL, right = NULL;
 
-    for (int pos = 0; pos < parsed.lines; pos++) {
-        sprintf(str, "program.%d.%s", pos + 1, "instruction");
-        json_object_dotset_string(root_object, str, il_commands_str[parsed.result[pos].code]);
-        sprintf(str, "program.%d.%s", pos + 1, "code");
-        json_object_dotset_number(root_object, str, parsed.result[pos].code);
-        sprintf(str, "program.%d.%s", pos + 1, "conditional");
-        json_object_dotset_number(root_object, str, parsed.result[pos].c);
-        sprintf(str, "program.%d.%s", pos + 1, "negate");
-        json_object_dotset_number(root_object, str, parsed.result[pos].n);
-        sprintf(str, "program.%d.%s", pos + 1, "push");
-        json_object_dotset_number(root_object, str, parsed.result[pos].p);
+    string_trim_m(line);
+    uint32_t spc = string_find_c(line, " ", 0);
 
-        if (parsed.result[pos].dataformat != LIT_CAL) {
-            sprintf(str2, pfx_iectype[parsed.result[pos].datatype]);
-            strremove(str2, "#");
-            sprintf(str, "program.%d.%s", pos + 1, "argument.datatype_str");
-            json_object_dotset_string(root_object, str, str2);
-            sprintf(str2, lit_dataformat_str[parsed.result[pos].dataformat]);
-            strremove(str2, "LIT_");
-            sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat_str");
-            json_object_dotset_string(root_object, str, str2);
-
-            sprintf(str, "program.%d.%s", pos + 1, "argument.datatype");
-            json_object_dotset_number(root_object, str, parsed.result[pos].datatype);
-            sprintf(str, "program.%d.%s", pos + 1, "argument.dataformat");
-            json_object_dotset_number(root_object, str, parsed.result[pos].dataformat);
-
-            sprintf(str, "program.%d.argument.str", pos + 1);
-            json_object_dotset_string(root_object, str, parsed.result[pos].str);
-            sprintf(str2, "program.%d.argument", pos + 1);
-            json_values(parsed.result[pos], dest, str2, pos, &root_object);
-        } else {
-            sprintf(str, "program.%d.%s", pos + 1, "argument.function");
-            json_object_dotset_string(root_object, str, parsed.result[pos].data.cal.func);
-            for (int n = 0; n < parsed.result[pos].data.cal.len; n++) {
-                sprintf(str, "program.%d.argument.variables.%s.str", pos + 1, parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_string(root_object, str, parsed.result[pos].data.cal.value[n].str);
-
-                sprintf(str2, pfx_iectype[parsed.result[pos].data.cal.value[n].datatype]);
-                strremove(str2, "#");
-                sprintf(str, "program.%d.%s.%s.datatype_str", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_string(root_object, str, str2);
-                sprintf(str2, lit_dataformat_str[parsed.result[pos].data.cal.value[n].dataformat]);
-                strremove(str2, "LIT_");
-                sprintf(str, "program.%d.%s.%s.dataformat_str", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_string(root_object, str, str2);
-
-                sprintf(str, "program.%d.%s.%s.datatype", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].datatype);
-                sprintf(str, "program.%d.%s.%s.dataformat", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_object_dotset_number(root_object, str, parsed.result[pos].data.cal.value[n].dataformat);
-                sprintf(str2, "program.%d.%s.%s", pos + 1, "argument.variables", parsed.result[pos].data.cal.var[n]);
-                json_values(parsed.result[pos].data.cal.value[n], dest, str2, pos, &root_object);
-            }
-        }
+    if (spc == STR_ERROR) {
+        left = string_new_c(line->data);
+        right = string_new_c("-");
+    } else {
+        left = string_left(line, spc - 1);
+        right = string_right(line, spc + 1);
     }
 
-    *dest = json_serialize_to_string_pretty(root_value);
-    json_value_free(root_value);
-    return 0;
+    string_toupper_m(right);
+    string_trim_m(left);
+    string_trim_m(right);
+
+    (*result)->code = STR_ERROR;
+    (*result)->lit_dataformat = LIT_NONE;
+    (*result)->iec_datatype = IEC_T_NULL;
+
+    for (uint32_t cmd = 0; cmd < 56; cmd++) {
+        if (string_equals_c(left, commands[cmd].str)) {
+            (*result)->code = commands[cmd].code;
+            (*result)->c = commands[cmd].c;
+            (*result)->n = commands[cmd].n;
+            (*result)->p = commands[cmd].p;
+            break;
+        }
+    }
+    if ((*result)->code == STR_ERROR) {
+        printf("ERROR: command illegal! [%s]\n", line->data);
+        exit(1);
+    }
+    if((*result)->code == 55)
+        goto end;
+
+    if ((*result)->code != IL_JMP && (*result)->code != IL_CAL && (*result)->code != IL_POP && (*result)->code != IL_S) {
+        (*result)->lit_dataformat = identify_lit_dataformat(right);
+        (*result)->iec_datatype = identify_iec_datatype(right);
+    }
+
+    end:
+    free(left);
+    free(right);
+}
+
+///////////////////////////////////////////////////////////////
+
+
+//////////////////////// free elements ////////////////////////
+
+static void free_labels(il_label_t **il_labels, int labels_qty) {
+    for (uint32_t lbl = 0; lbl < labels_qty; lbl++) {
+        free((*il_labels)[lbl].label);
+    }
+    free(*il_labels);
+}
+
+static void free_program(String **program, int program_lines) {
+    for (uint32_t line = 0; line < program_lines; line++) {
+        free((*program)[line]);
+    }
+    free(*program);
+}
+
+void free_il(il_t **il) {
+    if (*il == NULL || il == NULL)
+        return;
+
+    switch ((*il)->lit_dataformat) {
+        case LIT_STRING:
+        case LIT_VAR:
+            free((*il)->data.str);
+            break;
+        case LIT_CAL:
+            for (uint32_t n = 0; n < (*il)->data.cal.len; n++) {
+                free((*il)->data.cal.var[n]);
+                if ((*il)->data.cal.value[n].lit_dataformat == LIT_STRING || (*il)->data.cal.value[n].lit_dataformat == LIT_VAR)
+                    free((*il)->data.cal.value[n].data.str);
+            }
+            free((*il)->data.cal.func);
+            free((*il)->data.cal.var);
+            free((*il)->data.cal.value);
+            break;
+    }
+
+    free(*il);
+}
+
+///////////////////////////////////////////////////////////////
+
+void parse_file_il(char *file, parsed_il_t *parsed) {
+    il_label_t *il_labels = NULL;
+    uint32_t labels_qty = 0, program_lines = 0;
+    String *program = NULL;
+    uint32_t line;
+
+    // program loading and conditioning
+    program_lines = load_file(file, &program);
+    labels_qty = find_labels(&il_labels, &program, program_lines);
+    delete_comments(&program, program_lines);
+    sustitute_labels(&il_labels, labels_qty, &program, program_lines);
+    sustitute_others(&program, program_lines);
+    free_labels(&il_labels, labels_qty);
+    // ////////////////////////////////
+
+    parsed->result = malloc(sizeof(il_t*));
+    // parse program
+    for (line = 0; line < program_lines; line++) {
+
+        parsed->result = realloc(parsed->result, (line + 1) * sizeof(il_t*));
+        parsed->result[line] = malloc(sizeof(il_t));
+
+        DBG_PRINT("[%04d] %s\n", line, program[line]->data);
+
+        parse_command(program[line], &(parsed->result[line]));
+        if (parsed->result[line]->code == IL_CAL)
+            parsed->result[line]->lit_dataformat = LIT_CAL;
+
+        DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %d[%s], iec_datatype: %d[%s]]\n",
+                parsed->result[line]->code,
+                parsed->result[line]->code,
+                il_commands_str[parsed->result[line]->code],
+                parsed->result[line]->c,
+                parsed->result[line]->n,
+                parsed->result[line]->p,
+                parsed->result[line]->lit_dataformat,
+                lit_dataformat_str[parsed->result[line]->lit_dataformat],
+                parsed->result[line]->iec_datatype,
+                pfx_iectype[parsed->result[line]->iec_datatype]
+                );
+
+        String value = string_right(program[line], string_find_c(program[line], " ", 0) + 1);
+        if (parsed->result[line]->code != IL_CAL) {
+            uint32_t spc = string_find_c(value, "#", 0);
+            string_right_m(value, spc + 1);
+        }
+
+        if (
+                parsed->result[line]->lit_dataformat != LIT_STRING &&
+                parsed->result[line]->lit_dataformat != LIT_VAR    &&
+                parsed->result[line]->lit_dataformat != LIT_CAL
+           )
+        {
+            string_toupper_m(value);
+            while(string_find_c(value, "_", 0) != STR_ERROR) {
+                string_delete_c_m(value, "_");
+            }
+        }
+
+        parse_literal(value, parsed->result[line]->lit_dataformat, &(parsed->result[line]));
+
+        free(value);
+        DBG_PRINT("\n");
+    }
+    // /////////////
+
+    parsed->result = realloc(parsed->result, (line + 1) * sizeof(il_t*));
+    parsed->result[line] = malloc(sizeof(il_t));
+
+    parsed->result[line]->code = IL_END;
+    parsed->result[line]->iec_datatype = IEC_T_NULL;
+    parsed->result[line]->lit_dataformat = LIT_NONE;
+    parsed->result[line]->c = 0;
+    parsed->result[line]->n = 0;
+    parsed->result[line]->p = 0;
+
+    free_program(&program, program_lines);
+    parsed->lines = program_lines + 1;
 }

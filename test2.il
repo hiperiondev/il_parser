@@ -18,13 +18,14 @@ while:    LD 450           ; A
           JMP while
 reverse:  LD -12e-5        ; B
           SUB %m0.0        ; B - A
-          ST %m1.0         ; B = B - A
+          ST %md4.23       ; B = B - A
           JMP while
 endwhile: LD a_Variable_23 
           ST %qw5          (* output gcd *) 
 end:      ST %q0.0
           LD TIME_OF_DAY#11:36:15.20
           LD TIME#1h_15m_30s_60ms
+          LD TIME#15m_30s
           CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09)
           LD TIME#18ms
           LD DATE#2001-04-09
