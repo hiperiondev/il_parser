@@ -270,6 +270,9 @@ static int find_labels(il_label_t **il_labels, String **program, int program_lin
         ++pos;
         ++labels_qty;
     }
+
+    if(labels_qty == 0)
+        DBG_PRINT("    [NONE]\n");
     DBG_PRINT("\n");
 
     return labels_qty;
@@ -359,7 +362,7 @@ static int load_file(char *file, String **program) {
         DBG_PRINT("Error: can't open file\n");
         exit(1);
     }
-    printf("FILE: %s\n", file);
+    printf("[FILE: %s]\n\n", file);
     *program = malloc(sizeof(String));
 
     while ((line_size = getline(&line_buf, &line_buf_size, f) >= 0)) {
@@ -1121,6 +1124,19 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
     parsed->result[line]->c = 0;
     parsed->result[line]->n = 0;
     parsed->result[line]->p = 0;
+    DBG_PRINT("[%04d] END\n", line);
+    DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %d[%s], iec_datatype: %d[%s]]\n\n",
+            parsed->result[line]->code,
+            parsed->result[line]->code,
+            il_commands_str[parsed->result[line]->code],
+            parsed->result[line]->c, parsed->result[line]->n,
+            parsed->result[line]->p,
+            parsed->result[line]->lit_dataformat,
+            lit_dataformat_str[parsed->result[line]->lit_dataformat],
+            parsed->result[line]->iec_datatype,
+            pfx_iectype[parsed->result[line]->iec_datatype]
+             );
+
 
     free_program(&program, program_lines);
     parsed->lines = program_lines + 1;

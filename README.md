@@ -3,10 +3,11 @@ IEC61131-3 IL parser
 
 ### EXAMPLE
 ```
---------------------------------------------
 ------------------ test 1 ------------------
-FILE: test1.il
+[FILE: test1.il]
+
 [LABELS]
+    [NONE]
 
 [0000] LD PHY#i0.4
     [code: 1(0x01)[LD], conditional: 0, negate: 0, push: 0, lit_dataformat: 11[LIT_PHY], iec_datatype: 31[PHY#]]
@@ -96,16 +97,20 @@ FILE: test1.il
     [code: 2(0x02)[ST], conditional: 0, negate: 0, push: 0, lit_dataformat: 11[LIT_PHY], iec_datatype: 31[PHY#]]
         [prefix: 1[Q], datatype: 0[X] phy_a: 0, phy_b: 0]
 
+[0025] END
+    [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: 15[LIT_NONE], iec_datatype: 0[NULL#]]
+
 [lines = 26]
 --------------------------------------------
 
 ------------------ test 2 ------------------
-FILE: test2.il
+[FILE: test2.il]
+
 [LABELS]
-    [while line:8]
-    [reverse line:18]
-    [endwhile line:22]
-    [end line:24]
+    [while line: 8]
+    [reverse line: 18]
+    [endwhile line: 22]
+    [end line: 24]
 
 [0000] LD PHY#i0.0
     [code: 1(0x01)[LD], conditional: 0, negate: 0, push: 0, lit_dataformat: 11[LIT_PHY], iec_datatype: 31[PHY#]]
@@ -259,6 +264,9 @@ value: [A5](165)
         [integer: 145]
     [ _sTR_ (lit_dataformat: LIT_STRING, iec_datatype: NULL#) ]
         [string: string]
+
+[0036] END
+    [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: 15[LIT_NONE], iec_datatype: 0[NULL#]]
 
 [lines = 37]
 --------------------------------------------
