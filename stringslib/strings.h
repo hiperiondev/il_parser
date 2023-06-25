@@ -124,7 +124,7 @@ typedef struct string_hash_s string_hash_t; /**< hash result type >**/
          bool string_isinteger(const String buf);
          bool string_isfloat(const String buf);
          bool string_isblank(const String buf);
-         bool string_isalnum(const String buf, uint32_t pos, bool underscore);
+         bool string_isalnum(const String buf, uint32_t pos, bool underscore_dot);
       uint8_t string_isrealexp(const String buf);
          long string_tolong(const String buf, uint8_t base);
        double string_todouble(const String buf);
