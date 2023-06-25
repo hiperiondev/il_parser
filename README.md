@@ -254,7 +254,7 @@ value: [A5](165)
     [code: 1(0x01)[LD], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_STRING, iec_datatype: NULL#]
         [string: AaBb]
 
-[0035] CAL CTU_1 (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string")
+[0035] CAL CTU_1 (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test")
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
     [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
@@ -263,7 +263,7 @@ value: [A5](165)
     [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
         [integer: 145]
     [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
-        [string: string]
+        [string: str_test]
 
 [0036] CAL FUNC_NF (PHY#IX3.6, Limit, 145, "string")
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
@@ -276,7 +276,7 @@ value: [A5](165)
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
         [string: string]
 
-[0037] CAL FUN_IN_OUT (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string", OUT1=>FO1, OUT2=>FO2)
+[0037] CAL FUN_IN_OUT (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2)
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
     [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
@@ -285,15 +285,19 @@ value: [A5](165)
     [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
         [integer: 145]
     [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
-        [string: string]
+        [string: str_test]
     [ OUT1 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
         [variable: FO1]
     [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
         [variable: FO2]
 
-[0038] END
+[0038] ST  FUNC.IV
+    [code: 2(0x02)[ST], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAR, iec_datatype: NULL#]
+        [variable:  FUNC.IV]
+
+[0039] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]
 
-[lines = 39]
+[lines = 40]
 --------------------------------------------
 ```
