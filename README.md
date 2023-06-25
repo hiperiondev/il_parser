@@ -1,5 +1,5 @@
 # il_parser
-IEC61131-3 IL parser
+IEC61131-3 IL parser (edition 3.0 2013-02)
 
 ### EXAMPLE
 ```
