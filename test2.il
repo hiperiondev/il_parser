@@ -35,4 +35,5 @@ end:      ST %q0.0
           LD 'AaBb'
           CAL CTU_1 (RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string")
           CAL FUNC_NF (%IX3.6, Limit, 145, "string")   ; not formal
+          CAL FUN_IN_OUT (RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string", OUT1=>FO1, OUT2=>FO2)
           

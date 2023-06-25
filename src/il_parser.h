@@ -207,6 +207,7 @@ struct il {
               String func;              //
               String *var;              //
                 il_t *value;            //
+                bool *in_out;           // false: input parameter, true: output parameter
         } cal;                          //
     } data;                             //
 };

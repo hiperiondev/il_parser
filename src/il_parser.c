@@ -791,25 +791,32 @@ static void parse_cal(String value, il_t **result) {
     (*result)->data.cal.not_formal = false;
     (*result)->data.cal.value = malloc(sizeof(il_t));
     (*result)->data.cal.var = malloc(sizeof(String));
+    (*result)->data.cal.in_out = malloc(sizeof(bool));
 
     void internal(String pos_var, il_t **result) {
-        uint32_t peq;
+        uint32_t peq_in, peq_out;
         String var_val;
-        if ((peq = string_find_c(pos_var, ":=", 0)) == STR_ERROR)
+        if ((peq_in = string_find_c(pos_var, ":=", 0)) == STR_ERROR && (peq_out = string_find_c(pos_var, "=>", 0)) == STR_ERROR)
             (*result)->data.cal.not_formal = true;
 
-        if (peq != STR_ERROR && (*result)->data.cal.not_formal) {
+        if(peq_out != STR_ERROR)
+            peq_in = peq_out;
+
+        if (peq_in != STR_ERROR && (*result)->data.cal.not_formal) {
             printf("ERROR: cal illegal (formal/not formal)! [%s]\n", value->data);
             exit(1);
         }
 
         (*result)->data.cal.value = realloc((*result)->data.cal.value, ((*result)->data.cal.len + 1) * sizeof(il_t));
         (*result)->data.cal.var = realloc((*result)->data.cal.var, ((*result)->data.cal.len + 1) * sizeof(String));
+        (*result)->data.cal.in_out = realloc((*result)->data.cal.in_out, ((*result)->data.cal.len + 1) * sizeof(bool));
         il_t *cv = &((*result)->data.cal.value[(*result)->data.cal.len]);
 
+        (*result)->data.cal.in_out[(*result)->data.cal.len] = (peq_out != STR_ERROR) ? 1 : 0;
+
         if (!(*result)->data.cal.not_formal) {
-            (*result)->data.cal.var[(*result)->data.cal.len] = string_left(pos_var, peq - 1);
-            var_val = string_right(pos_var, peq + 2);
+            (*result)->data.cal.var[(*result)->data.cal.len] = string_left(pos_var, peq_in - 1);
+            var_val = string_right(pos_var, peq_in + 2);
         } else {
             (*result)->data.cal.var[(*result)->data.cal.len] = string_new_c("NOT_FORMAL");
             var_val = string_new_c(pos_var->data);
@@ -818,8 +825,9 @@ static void parse_cal(String value, il_t **result) {
         (*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat = identify_lit_dataformat(var_val);
         (*result)->data.cal.value[(*result)->data.cal.len].iec_datatype = identify_iec_datatype(var_val);
 
-        DBG_PRINT("    [ %s (lit_dataformat: %s, iec_datatype: %s) ]\n",
+        DBG_PRINT("    [ %s [in/out: %d] lit_dataformat: %s, iec_datatype: %s ]\n",
                      (*result)->data.cal.var[(*result)->data.cal.len]->data,
+                     (*result)->data.cal.in_out[(*result)->data.cal.len],
                      lit_dataformat_str[(*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat],
                      pfx_iectype[(*result)->data.cal.value[(*result)->data.cal.len].iec_datatype]
                  );
@@ -1049,6 +1057,7 @@ void free_il(il_t **il) {
                 if ((*il)->data.cal.value[n].lit_dataformat == LIT_STRING || (*il)->data.cal.value[n].lit_dataformat == LIT_VAR)
                     free((*il)->data.cal.value[n].data.str);
             }
+            free((*il)->data.cal.in_out);
             free((*il)->data.cal.func);
             free((*il)->data.cal.var);
             free((*il)->data.cal.value);
