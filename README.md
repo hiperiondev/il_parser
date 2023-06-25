@@ -221,13 +221,13 @@ value: [A5](165)
 
 [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09)
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
-    [ var1 (lit_dataformat: LIT_DURATION, iec_datatype: TIME#) ]
+    [ var1 [in/out: 0] lit_dataformat: LIT_DURATION, iec_datatype: TIME# ]
         [H: 1, M: 15, S: 30, MS: 60]
-    [ PV (lit_dataformat: LIT_DATE_AND_TIME, iec_datatype: TIME#) ]
+    [ PV [in/out: 0] lit_dataformat: LIT_DATE_AND_TIME, iec_datatype: TIME# ]
         [year: 2001, month: 4, day: 9, H: 11, M: 36, S: 15, MS: 20]
-    [ CU (lit_dataformat: LIT_REAL_EXP, iec_datatype: NULL#) ]
+    [ CU [in/out: 0] lit_dataformat: LIT_REAL_EXP, iec_datatype: NULL# ]
         [real: -12000000.000000]
-    [ DT (lit_dataformat: LIT_DATE, iec_datatype: DATE#) ]
+    [ DT [in/out: 0] lit_dataformat: LIT_DATE, iec_datatype: DATE# ]
         [year: 2001, month: 4, day: 9]
 
 [0029] LD TIME#18ms
@@ -256,18 +256,44 @@ value: [A5](165)
 
 [0035] CAL CTU_1 (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string")
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
-    [ RESET (lit_dataformat: LIT_PHY, iec_datatype: PHY#) ]
+    [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
-    [ PVv_5 (lit_dataformat: LIT_VAR, iec_datatype: NULL#) ]
+    [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
         [variable: Limit]
-    [ _aCU (lit_dataformat: LIT_INTEGER, iec_datatype: NULL#) ]
+    [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
         [integer: 145]
-    [ _sTR_ (lit_dataformat: LIT_STRING, iec_datatype: NULL#) ]
+    [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
         [string: string]
 
-[0036] END
+[0036] CAL FUNC_NF (PHY#IX3.6, Limit, 145, "string")
+    [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
+        [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: Limit]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
+        [integer: 145]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
+        [string: string]
+
+[0037] CAL FUN_IN_OUT (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="string", OUT1=>FO1, OUT2=>FO2)
+    [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
+        [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
+    [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: Limit]
+    [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
+        [integer: 145]
+    [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
+        [string: string]
+    [ OUT1 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO1]
+    [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO2]
+
+[0038] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]
 
-[lines = 37]
+[lines = 39]
 --------------------------------------------
 ```
