@@ -788,13 +788,18 @@ static void parse_cal(String value, il_t **result) {
     string_trim_m(value);
 
     (*result)->data.cal.len = 0;
+    (*result)->data.cal.not_formal = false;
     (*result)->data.cal.value = malloc(sizeof(il_t));
     (*result)->data.cal.var = malloc(sizeof(String));
 
     void internal(String pos_var, il_t **result) {
         uint32_t peq;
-        if ((peq = string_find_c(pos_var, ":=", 0)) == STR_ERROR) {
-            printf("ERROR: cal variable illegal! [%s]\n", value->data);
+        String var_val;
+        if ((peq = string_find_c(pos_var, ":=", 0)) == STR_ERROR)
+            (*result)->data.cal.not_formal = true;
+
+        if (peq != STR_ERROR && (*result)->data.cal.not_formal) {
+            printf("ERROR: cal illegal (formal/not formal)! [%s]\n", value->data);
             exit(1);
         }
 
@@ -802,9 +807,14 @@ static void parse_cal(String value, il_t **result) {
         (*result)->data.cal.var = realloc((*result)->data.cal.var, ((*result)->data.cal.len + 1) * sizeof(String));
         il_t *cv = &((*result)->data.cal.value[(*result)->data.cal.len]);
 
-        (*result)->data.cal.var[(*result)->data.cal.len] = string_left(pos_var, peq - 1);
+        if (!(*result)->data.cal.not_formal) {
+            (*result)->data.cal.var[(*result)->data.cal.len] = string_left(pos_var, peq - 1);
+            var_val = string_right(pos_var, peq + 2);
+        } else {
+            (*result)->data.cal.var[(*result)->data.cal.len] = string_new_c("NOT_FORMAL");
+            var_val = string_new_c(pos_var->data);
+        }
 
-        String var_val = string_right(pos_var, peq + 2);
         (*result)->data.cal.value[(*result)->data.cal.len].lit_dataformat = identify_lit_dataformat(var_val);
         (*result)->data.cal.value[(*result)->data.cal.len].iec_datatype = identify_iec_datatype(var_val);
 
@@ -842,6 +852,7 @@ static void parse_cal(String value, il_t **result) {
 
     String pos_var = string_right(value, pos + 1);
     internal(pos_var, result);
+
     free(pos_var);
 }
 
@@ -1077,16 +1088,14 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
         if (parsed->result[line]->code == IL_CAL)
             parsed->result[line]->lit_dataformat = LIT_CAL;
 
-        DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %d[%s], iec_datatype: %d[%s]]\n",
+        DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n",
                 parsed->result[line]->code,
                 parsed->result[line]->code,
                 il_commands_str[parsed->result[line]->code],
                 parsed->result[line]->c,
                 parsed->result[line]->n,
                 parsed->result[line]->p,
-                parsed->result[line]->lit_dataformat,
                 lit_dataformat_str[parsed->result[line]->lit_dataformat],
-                parsed->result[line]->iec_datatype,
                 pfx_iectype[parsed->result[line]->iec_datatype]
                 );
 
@@ -1125,15 +1134,13 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
     parsed->result[line]->n = 0;
     parsed->result[line]->p = 0;
     DBG_PRINT("[%04d] END\n", line);
-    DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %d[%s], iec_datatype: %d[%s]]\n\n",
+    DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n\n",
             parsed->result[line]->code,
             parsed->result[line]->code,
             il_commands_str[parsed->result[line]->code],
             parsed->result[line]->c, parsed->result[line]->n,
             parsed->result[line]->p,
-            parsed->result[line]->lit_dataformat,
             lit_dataformat_str[parsed->result[line]->lit_dataformat],
-            parsed->result[line]->iec_datatype,
             pfx_iectype[parsed->result[line]->iec_datatype]
              );
 

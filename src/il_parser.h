@@ -172,9 +172,9 @@ struct il {
                      uint32_t phy_a;    //
                      uint32_t phy_b;    //
                     } bit;              //
-                     uint8_t byte;      //
-                    uint16_t word;      //
-                      double dbl;       //
+                      uint8_t byte;     //
+                     uint16_t word;     //
+                       double dbl;      //
             } data;                     //
         } phy;                          //
         struct {
@@ -195,13 +195,14 @@ struct il {
                 uint16_t year;          //
             } date;                     //
             struct {
-                uint8_t msec;           //
-                uint8_t sec;            //
-                uint8_t min;            //
-                uint8_t hour;           //
+                 uint8_t msec;          //
+                 uint8_t sec;           //
+                 uint8_t min;           //
+                 uint8_t hour;          //
             } tod;                      //
         } dt;                           //
         struct {
+                bool not_formal;        //
             uint32_t len;               //
               String func;              //
               String *var;              //
