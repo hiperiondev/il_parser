@@ -70,7 +70,7 @@ typedef enum COMMANDS {
     IL_CAL, //  0x14 |    CN     |  Call of a program or a function block.
     IL_RET, //  0x15 |    CN     |  Return from subroutine.
     IL_POP, //  0x16 |           |  Pop from stack.
-    IL_17,  //  0x17 |           |  not defined.
+    IL_CAI, //  0x17 |           |  Call implicit (function)
     IL_18,  //  0x18 |           |  not defined.
     IL_19,  //  0x19 |           |  not defined.
     IL_1A,  //  0x1a |           |  not defined.

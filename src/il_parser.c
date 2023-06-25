@@ -134,7 +134,7 @@ static const char *il_commands_str[] = {
         "CAL", // 0x14
         "RET", // 0x15
         "POP", // 0x16
-        "???", // 0x17
+        "CAL", // 0x17
         "???", // 0x18
         "???", // 0x19
         "???", // 0x1a
@@ -782,8 +782,11 @@ static void parse_cal(String value, il_t **result) {
 
     pos = string_find_c(value, " ", 0);
     (*result)->data.cal.func = string_left(value, pos - 1);
+    DBG_PRINT("    [func: %s]\n", (*result)->data.cal.func->data);
+
     string_right_m(value, pos + 1);
-    value->data[0] = ' ';
+    if (value->data[0] == '(')
+        value->data[0] = ' ';
     string_delete_postfix_c_m(value, ")");
     string_trim_m(value);
 
@@ -996,6 +999,9 @@ void parse_command(String line, il_t **result) {
     (*result)->code = STR_ERROR;
     (*result)->lit_dataformat = LIT_NONE;
     (*result)->iec_datatype = IEC_T_NULL;
+    (*result)->c = 0;
+    (*result)->n = 0;
+    (*result)->p = 0;
 
     for (uint32_t cmd = 0; cmd < 56; cmd++) {
         if (string_equals_c(left, commands[cmd].str)) {
@@ -1006,14 +1012,13 @@ void parse_command(String line, il_t **result) {
             break;
         }
     }
-    if ((*result)->code == STR_ERROR) {
-        printf("ERROR: command illegal! [%s]\n", line->data);
-        exit(1);
-    }
+    if ((*result)->code == STR_ERROR)
+        (*result)->code = IL_CAI;
+
     if((*result)->code == 55)
         goto end;
 
-    if ((*result)->code != IL_JMP && (*result)->code != IL_CAL && (*result)->code != IL_POP && (*result)->code != IL_S) {
+    if ((*result)->code != IL_JMP && (*result)->code != IL_CAL && (*result)->code != IL_CAI && (*result)->code != IL_POP && (*result)->code != IL_S) {
         (*result)->lit_dataformat = identify_lit_dataformat(right);
         (*result)->iec_datatype = identify_iec_datatype(right);
     }
@@ -1073,6 +1078,7 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
     il_label_t *il_labels = NULL;
     uint32_t labels_qty = 0, program_lines = 0;
     String *program = NULL;
+    String value;
     uint32_t line;
 
     // program loading and conditioning
@@ -1094,7 +1100,7 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
         DBG_PRINT("[%04d] %s\n", line, program[line]->data);
 
         parse_command(program[line], &(parsed->result[line]));
-        if (parsed->result[line]->code == IL_CAL)
+        if (parsed->result[line]->code == IL_CAL || parsed->result[line]->code == IL_CAI)
             parsed->result[line]->lit_dataformat = LIT_CAL;
 
         DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n",
@@ -1108,7 +1114,13 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
                 pfx_iectype[parsed->result[line]->iec_datatype]
                 );
 
-        String value = string_right(program[line], string_find_c(program[line], " ", 0) + 1);
+        if (parsed->result[line]->code != IL_CAI)
+            value = string_right(program[line], string_find_c(program[line], " ", 0) + 1);
+        else {
+            value = string_new_c(program[line]->data);
+            parsed->result[line]->code = IL_CAL;
+        }
+
         if (parsed->result[line]->code != IL_CAL) {
             uint32_t spc = string_find_c(value, "#", 0);
             string_right_m(value, spc + 1);

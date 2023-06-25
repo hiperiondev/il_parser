@@ -37,3 +37,4 @@ end:      ST %q0.0
           CAL FUNC_NF (%IX3.6, Limit, 145, "string")   ; not formal
           CAL FUN_IN_OUT (RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2)
           ST  FUNC.IV
+          otherFUNC %IX3.6, Limit, 145, "string"

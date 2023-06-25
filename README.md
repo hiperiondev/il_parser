@@ -221,6 +221,7 @@ value: [A5](165)
 
 [0028] CAL FUN_3 (var1:=TIME#1h_15m_30s_60ms, PV:=DATE_AND_TIME#2001-04-09-11:36:15.20, CU:=-12e6, DT:=DATE#2001-04-09)
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: FUN_3]
     [ var1 [in/out: 0] lit_dataformat: LIT_DURATION, iec_datatype: TIME# ]
         [H: 1, M: 15, S: 30, MS: 60]
     [ PV [in/out: 0] lit_dataformat: LIT_DATE_AND_TIME, iec_datatype: TIME# ]
@@ -256,6 +257,7 @@ value: [A5](165)
 
 [0035] CAL CTU_1 (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test")
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: CTU_1]
     [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
     [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
@@ -267,6 +269,7 @@ value: [A5](165)
 
 [0036] CAL FUNC_NF (PHY#IX3.6, Limit, 145, "string")
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: FUNC_NF]
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
@@ -278,6 +281,7 @@ value: [A5](165)
 
 [0037] CAL FUN_IN_OUT (RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2)
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: FUN_IN_OUT]
     [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
     [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
@@ -295,9 +299,21 @@ value: [A5](165)
     [code: 2(0x02)[ST], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAR, iec_datatype: NULL#]
         [variable:  FUNC.IV]
 
-[0039] END
+[0039] OTHERFUNC PHY#IX3.6, Limit, 145, "string"
+    [code: 23(0x17)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: OTHERFUNC]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
+        [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: Limit]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
+        [integer: 145]
+    [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
+        [string: string]
+
+[0040] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]
 
-[lines = 40]
+[lines = 41]
 --------------------------------------------
 ```
