@@ -106,15 +106,35 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
 ------------------ test 2 ------------------
 [FILE: test2.il]
 
-[ >> is expanded << ]
+[ >> is expanded (CAL) << ]
   >> [CAL FUN_EXP1 (]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2]
-  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2)]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6,]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit,]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145,]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test",]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1,]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2]
+  >> [CAL FUN_EXP1 ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2 )]
+[ >> end expanded << ]
+
+[ >> is expanded (CAL) << ]
+  >> [GEN_FUN_EXP (]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6,]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6, PVv_5:=Limit,]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145,]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test",]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1,]
+  >> [GEN_FUN_EXP ( RESET:=%IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2)]
+[ >> end expanded << ]
+
+[ >> is expanded (VAR) << ]
+  >> [VAR]
+  >> [VAR C10 = CTU ]
+  >> [VAR C10 = CTU  CMD_TMR = TON ]
+  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT ]
+  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME ]
+  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL ]
+  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL  END_VAR]
 [ >> end expanded << ]
 
 [LABELS]
@@ -310,7 +330,7 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
         [variable:  FUNC.IV]
 
 [0039] OTHERFUNC PHY#IX3.6, Limit, 145, "string"
-    [code: 23(0x17)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [code: 30(0x1e)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
     [func: OTHERFUNC]
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
         [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
@@ -321,7 +341,7 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
         [string: string]
 
-[0040] CAL FUN_EXP1 (RESET:=PHY#IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2)
+[0040] CAL FUN_EXP1 ( RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2 )
     [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
     [func: FUN_EXP1]
     [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
@@ -337,9 +357,31 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
     [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
         [variable: FO2]
 
-[0041] END
+[0041] GEN_FUN_EXP ( RESET:=PHY#IX3.6, PVv_5:=Limit, _aCU:=145, _sTR_:="str_test", OUT1=>FO1, OUT2=>FO2)
+    [code: 30(0x1e)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: GEN_FUN_EXP]
+    [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
+        [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
+    [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: Limit]
+    [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
+        [integer: 145]
+    [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
+        [string: str_test]
+    [ OUT1 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO1]
+    [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO2]
+
+[0042] VAR C10 =  CTU  END_VAR
+    [code: 29(0x1d)[VAR], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAI, iec_datatype: NULL#]
+
+[0043] VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL  END_VAR
+    [code: 29(0x1d)[VAR], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAI, iec_datatype: NULL#]
+
+[0044] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]
 
-[lines = 42]
+[lines = 45]
 --------------------------------------------
 ```
