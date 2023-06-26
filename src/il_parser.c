@@ -244,6 +244,8 @@ static const char phy_data_type_c[] = {
     'D', //
 };
 
+void parse_command(String line, il_t **result);
+
 /////////////// load and conditioning functions ///////////////
 
 static int find_labels(il_label_t **il_labels, String **program, int program_lines) {
@@ -352,10 +354,13 @@ static void sustitute_others(String **program, int program_lines) {
 static int load_file(char *file, String **program) {
     FILE *f;
     uint32_t lines = 0;
+    uint32_t ppos;
     char *line_buf = NULL;
     size_t line_buf_size = 0;
     size_t line_size;
-    String linebf;
+    String linebf, expanded = NULL;
+    bool is_expanded = false;
+    il_t *il_tmp = malloc(sizeof(il_t));
 
     f = fopen(file, "r");
     if (f == NULL) {
@@ -373,11 +378,56 @@ static int load_file(char *file, String **program) {
         }
         string_trim_m(linebf);
 
+        //// expanded format ////
+
+        if (!is_expanded) {
+            String tmp = string_new_c(linebf->data);
+            if ((ppos = string_find_c(tmp, ": ", 0)) != STR_ERROR) {
+                string_right_m(tmp, ppos + 2);
+            }
+            if ((ppos = string_find_c(tmp, ";", 0)) != STR_ERROR) {
+                string_left_m(tmp, ppos - 1);
+            }
+            string_trim_m(tmp);
+            string_toupper_m(tmp);
+            parse_command(tmp, &il_tmp);
+            if (il_tmp->code == IL_CAL || il_tmp->code == IL_CAI) {
+                if ((ppos = string_find_c(tmp, "(", 0)) != STR_ERROR && (ppos = string_find_c(tmp, ")", 0)) == STR_ERROR) {
+                    expanded = string_new_c(linebf->data);
+                    DBG_PRINT("[ >> is expanded << ]\n  >> [%s]\n", expanded->data);
+                    is_expanded = true;
+                    free(tmp);
+                    free(linebf);
+                    continue;
+                }
+            }
+            free(tmp);
+        } else {
+            string_concat_m(expanded, linebf);
+            DBG_PRINT("  >> [%s]\n", expanded->data);
+            if ((ppos = string_find_c(expanded, ")", 0)) == STR_ERROR) {
+                free(linebf);
+                continue;
+            }
+            DBG_PRINT("[ >> end expanded << ]\n\n");
+        }
+
+        /////////////////////////
+
         *program = realloc(*program, (lines + 1) * sizeof(String));
-        (*program)[lines++] = linebf;
+        if (!is_expanded)
+            (*program)[lines++] = string_new_c(linebf->data);
+        else {
+            (*program)[lines++] = string_new_c(expanded->data);
+            free(expanded);
+            is_expanded = false;
+        }
+
+        free(linebf);
     }
 
     free(line_buf);
+    free(il_tmp);
     fclose(f);
 
     return lines;
@@ -750,7 +800,6 @@ static void parse_real_exp(String value, il_t **result) {
 
 static void parse_base(String value, il_t **result) {
     string_right_m(value, string_find_c(value, "#", 0) + 1);
-    printf("value: [%s](%d)\n", value->data, (int)string_tolong(value, 16));
     switch ((*result)->lit_dataformat) {
         case LIT_BASE2:
             if (((*result)->data.integer = string_tolong(value, 2)) != string_tolong(value, 2)) {

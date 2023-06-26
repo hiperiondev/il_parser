@@ -106,6 +106,17 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
 ------------------ test 2 ------------------
 [FILE: test2.il]
 
+[ >> is expanded << ]
+  >> [CAL FUN_EXP1 (]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2]
+  >> [CAL FUN_EXP1 (RESET:=%IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2)]
+[ >> end expanded << ]
+
 [LABELS]
     [while line: 8]
     [reverse line: 18]
@@ -155,7 +166,6 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
 
 [0011] LD UINT#16#a5
     [code: 1(0x01)[LD], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_BASE16, iec_datatype: UINT#]
-value: [A5](165)
         [integer: 165]
 
 [0012] LT PHY#m1.0
@@ -311,9 +321,25 @@ value: [A5](165)
     [ NOT_FORMAL [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
         [string: string]
 
-[0040] END
+[0040] CAL FUN_EXP1 (RESET:=PHY#IX3.6,PVv_5:=Limit,_aCU:=145,_sTR_:="str_test",OUT1=>FO1,OUT2=>FO2)
+    [code: 20(0x14)[CAL], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_CAL, iec_datatype: NULL#]
+    [func: FUN_EXP1]
+    [ RESET [in/out: 0] lit_dataformat: LIT_PHY, iec_datatype: PHY# ]
+        [prefix: 0[I], datatype: 0[X] phy_a: 3, phy_b: 6]
+    [ PVv_5 [in/out: 0] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: Limit]
+    [ _aCU [in/out: 0] lit_dataformat: LIT_INTEGER, iec_datatype: NULL# ]
+        [integer: 145]
+    [ _sTR_ [in/out: 0] lit_dataformat: LIT_STRING, iec_datatype: NULL# ]
+        [string: str_test]
+    [ OUT1 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO1]
+    [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
+        [variable: FO2]
+
+[0041] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]
 
-[lines = 41]
+[lines = 42]
 --------------------------------------------
 ```
