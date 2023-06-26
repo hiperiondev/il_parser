@@ -259,6 +259,12 @@ static int find_labels(il_label_t **il_labels, String **program, int program_lin
     for (uint32_t pc = 0; pc < program_lines; pc++) {
         if ((index = string_find_c((*program)[pc], ":", 0)) == STR_ERROR)
             continue;
+
+        if (index == (*program)[pc]->length - 1) {
+            printf("ERROR: label alone! [%s]\n", (*program)[pc]->data);
+            exit(1);
+        }
+
         if ((*program)[pc]->data[index + 1] != ' ')
             continue;
         *il_labels = realloc(*il_labels, (pos + 1) * sizeof(il_label_t));

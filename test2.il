@@ -62,8 +62,4 @@ end:      ST %q0.0
              A, B: INT;
              ELAPSED: TIME;
              OUT, ERR, TEMPL, COND: BOOL;
-         END_VAR 
-         
-         
-         
-        
+         END_VAR
