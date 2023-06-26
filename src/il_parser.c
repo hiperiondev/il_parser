@@ -415,7 +415,7 @@ static int load_file(char *file, String **program) {
             if (il_tmp->code == IL_CAL || il_tmp->code == IL_CAI) {
                 if ((ppos = string_find_c(tmp, "(", 0)) != STR_ERROR && (ppos = string_find_c(tmp, ")", 0)) == STR_ERROR) {
                     expanded = string_new_c(tmp->data);
-                    DBG_PRINT("[ >> is expanded (CAL) << ]\n  >> [%s]\n", expanded->data);
+                    DBG_PRINT("[ start expanded (CAL) ]\n    [ %s ]\n", expanded->data);
                     is_expanded = true;
                     is_var = false;
                     free(tmp);
@@ -426,7 +426,7 @@ static int load_file(char *file, String **program) {
 
             if (il_tmp->code == IL_VAD && (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
                 expanded = string_new_c(tmp->data);
-                DBG_PRINT("[ >> is expanded (VAR) << ]\n  >> [%s]\n", expanded->data);
+                DBG_PRINT("[ start expanded (VAR) ]\n    [ %s ]\n", tmp->data);
                 is_expanded = true;
                 is_var = true;
                 free(tmp);
@@ -484,8 +484,8 @@ static int load_file(char *file, String **program) {
             string_concat_m(expanded, spc);
             string_concat_m(expanded, tmp);
 
+            DBG_PRINT("    [ %s ]\n", tmp->data);
             free(tmp);
-            DBG_PRINT("  >> [%s]\n", expanded->data);
 
             if (!is_var && (ppos = string_find_c(expanded, ")", 0)) == STR_ERROR) {
                 free(linebf);
@@ -496,7 +496,7 @@ static int load_file(char *file, String **program) {
                 free(linebf);
                 continue;
             }
-            DBG_PRINT("[ >> end expanded << ]\n\n");
+            DBG_PRINT("[ end expanded ]\n\n");
         }
 
         /////////////////////////
