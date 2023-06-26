@@ -52,62 +52,63 @@ typedef struct il_label_s {
 
 static const il_str_t commands[] = {
 //  STR_CMD, CODE  , C, N, P
-  { "LD"   , IL_LD , 0, 0, 0 },
-  { "LDN"  , IL_LD , 0, 1, 0 },
-  { "ST"   , IL_ST , 0, 0, 0 },
-  { "STN"  , IL_ST , 0, 1, 0 },
-  { "S"    , IL_S  , 0, 0, 0 },
-  { "R"    , IL_R  , 0, 0, 0 },
-  { "AND"  , IL_AND, 0, 0, 0 },
-  { "&"    , IL_AND, 0, 0, 0 },
-  { "ANDN" , IL_AND, 0, 1, 0 },
-  { "&N"   , IL_AND, 0, 1, 0 },
-  { "OR"   , IL_OR , 0, 0, 0 },
-  { "ORN"  , IL_OR , 0, 1, 0 },
-  { "XOR"  , IL_XOR, 0, 0, 0 },
-  { "XORN" , IL_XOR, 0, 1, 0 },
-  { "AND(" , IL_AND, 0, 0, 1 },
-  { "&("   , IL_AND, 0, 0, 1 },
-  { "ANDN(", IL_AND, 0, 1, 1 },
-  { "&N("  , IL_AND, 0, 1, 1 },
-  { "OR("  , IL_OR , 0, 0, 1 },
-  { "ORN(" , IL_OR , 0, 1, 1 },
-  { "XOR(" , IL_XOR, 0, 0, 1 },
-  { "XORN(", IL_XOR, 0, 1, 1 },
-  { "ADD"  , IL_ADD, 0, 0, 0 },
-  { "SUB"  , IL_SUB, 0, 0, 0 },
-  { "MUL"  , IL_MUL, 0, 0, 0 },
-  { "DIV"  , IL_DIV, 0, 0, 0 },
-  { "GT"   , IL_GT , 0, 0, 0 },
-  { "GE"   , IL_GE , 0, 0, 0 },
-  { "EQ"   , IL_EQ , 0, 0, 0 },
-  { "NE"   , IL_NE , 0, 0, 0 },
-  { "LE"   , IL_LE , 0, 0, 0 },
-  { "LT"   , IL_LT , 0, 0, 0 },
-  { "ADD(" , IL_ADD, 0, 0, 1 },
-  { "SUB(" , IL_SUB, 0, 0, 1 },
-  { "MUL(" , IL_MUL, 0, 0, 1 },
-  { "DIV(" , IL_DIV, 0, 0, 1 },
-  { "GT("  , IL_GT , 0, 0, 1 },
-  { "GE("  , IL_GE , 0, 0, 1 },
-  { "EQ("  , IL_EQ , 0, 0, 1 },
-  { "NE("  , IL_NE , 0, 0, 1 },
-  { "LE("  , IL_LE , 0, 0, 1 },
-  { "LT("  , IL_LT , 0, 0, 1 },
-  { "JMP"  , IL_JMP, 0, 0, 0 },
-  { "JMPC" , IL_JMP, 1, 0, 0 },
-  { "JMPCN", IL_JMP, 1, 1, 0 },
-  { "JMPNC", IL_JMP, 1, 1, 0 },
-  { "CAL"  , IL_CAL, 0, 0, 0 },
-  { "CALC" , IL_CAL, 1, 0, 0 },
-  { "CALCN", IL_CAL, 1, 1, 0 },
-  { "CALNC", IL_CAL, 1, 1, 0 },
-  { "RET"  , IL_RET, 0, 0, 0 },
-  { "RETC" , IL_RET, 1, 0, 0 },
-  { "RETCN", IL_RET, 1, 1, 0 },
-  { "RETNC", IL_RET, 1, 1, 0 },
-  { ")"    , IL_POP, 0, 0, 0 },
-  { ""     , IL_END, 0, 0, 0 },
+  { "LD"   , IL_LD , 0, 0, 0 }, // 1
+  { "LDN"  , IL_LD , 0, 1, 0 }, // 2
+  { "ST"   , IL_ST , 0, 0, 0 }, // 3
+  { "STN"  , IL_ST , 0, 1, 0 }, // 4
+  { "S"    , IL_S  , 0, 0, 0 }, // 5
+  { "R"    , IL_R  , 0, 0, 0 }, // 6
+  { "AND"  , IL_AND, 0, 0, 0 }, // 7
+  { "&"    , IL_AND, 0, 0, 0 }, // 8
+  { "ANDN" , IL_AND, 0, 1, 0 }, // 9
+  { "&N"   , IL_AND, 0, 1, 0 }, // 10
+  { "OR"   , IL_OR , 0, 0, 0 }, // 11
+  { "ORN"  , IL_OR , 0, 1, 0 }, // 12
+  { "XOR"  , IL_XOR, 0, 0, 0 }, // 13
+  { "XORN" , IL_XOR, 0, 1, 0 }, // 14
+  { "AND(" , IL_AND, 0, 0, 1 }, // 15
+  { "&("   , IL_AND, 0, 0, 1 }, // 16
+  { "ANDN(", IL_AND, 0, 1, 1 }, // 17
+  { "&N("  , IL_AND, 0, 1, 1 }, // 18
+  { "OR("  , IL_OR , 0, 0, 1 }, // 19
+  { "ORN(" , IL_OR , 0, 1, 1 }, // 20
+  { "XOR(" , IL_XOR, 0, 0, 1 }, // 21
+  { "XORN(", IL_XOR, 0, 1, 1 }, // 22
+  { "ADD"  , IL_ADD, 0, 0, 0 }, // 23
+  { "SUB"  , IL_SUB, 0, 0, 0 }, // 24
+  { "MUL"  , IL_MUL, 0, 0, 0 }, // 25
+  { "DIV"  , IL_DIV, 0, 0, 0 }, // 26
+  { "GT"   , IL_GT , 0, 0, 0 }, // 27
+  { "GE"   , IL_GE , 0, 0, 0 }, // 28
+  { "EQ"   , IL_EQ , 0, 0, 0 }, // 29
+  { "NE"   , IL_NE , 0, 0, 0 }, // 30
+  { "LE"   , IL_LE , 0, 0, 0 }, // 31
+  { "LT"   , IL_LT , 0, 0, 0 }, // 32
+  { "ADD(" , IL_ADD, 0, 0, 1 }, // 33
+  { "SUB(" , IL_SUB, 0, 0, 1 }, // 34
+  { "MUL(" , IL_MUL, 0, 0, 1 }, // 35
+  { "DIV(" , IL_DIV, 0, 0, 1 }, // 36
+  { "GT("  , IL_GT , 0, 0, 1 }, // 37
+  { "GE("  , IL_GE , 0, 0, 1 }, // 38
+  { "EQ("  , IL_EQ , 0, 0, 1 }, // 39
+  { "NE("  , IL_NE , 0, 0, 1 }, // 40
+  { "LE("  , IL_LE , 0, 0, 1 }, // 41
+  { "LT("  , IL_LT , 0, 0, 1 }, // 42
+  { "JMP"  , IL_JMP, 0, 0, 0 }, // 43
+  { "JMPC" , IL_JMP, 1, 0, 0 }, // 44
+  { "JMPCN", IL_JMP, 1, 1, 0 }, // 45
+  { "JMPNC", IL_JMP, 1, 1, 0 }, // 46
+  { "CAL"  , IL_CAL, 0, 0, 0 }, // 47
+  { "CALC" , IL_CAL, 1, 0, 0 }, // 48
+  { "CALCN", IL_CAL, 1, 1, 0 }, // 49
+  { "CALNC", IL_CAL, 1, 1, 0 }, // 50
+  { "RET"  , IL_RET, 0, 0, 0 }, // 51
+  { "RETC" , IL_RET, 1, 0, 0 }, // 52
+  { "RETCN", IL_RET, 1, 1, 0 }, // 53
+  { "RETNC", IL_RET, 1, 1, 0 }, // 54
+  { ")"    , IL_POP, 0, 0, 0 }, // 55
+  { "VAR"  , IL_VAI, 0, 0, 0 }, // 56
+  { ""     , IL_END, 0, 0, 0 }  // 57
 };
 
 static const char *il_commands_str[] = {
@@ -134,14 +135,14 @@ static const char *il_commands_str[] = {
         "CAL", // 0x14
         "RET", // 0x15
         "POP", // 0x16
-        "CAL", // 0x17
+        "???", // 0x17
         "???", // 0x18
         "???", // 0x19
         "???", // 0x1a
         "???", // 0x1b
         "???", // 0x1c
-        "???", // 0x1d
-        "???", // 0x1e
+        "VAR", // 0x1d (internal use)
+        "CAL", // 0x1e (internal use)
         "END", // 0x1f
 };
 
@@ -161,7 +162,8 @@ static const char *lit_dataformat_str[] = {
     "LIT_STRING",        // 0x0d
     "LIT_VAR",           // 0x0e
     "LIT_CAL",           // 0x0f
-    "LIT_NONE"           // 0x10
+    "LIT_VAI",           // 0x10
+    "LIT_NONE"           // 0x11
 };
 
 static const char *pfx_dataformat[] = {
@@ -360,7 +362,9 @@ static int load_file(char *file, String **program) {
     size_t line_size;
     String linebf, expanded = NULL;
     bool is_expanded = false;
+    bool is_var = false;
     il_t *il_tmp = malloc(sizeof(il_t));
+    String spc = string_new_c(" ");
 
     f = fopen(file, "r");
     if (f == NULL) {
@@ -378,39 +382,78 @@ static int load_file(char *file, String **program) {
         }
         string_trim_m(linebf);
 
-        //// expanded format ////
+        // modify VAR
+        if ((ppos = string_find_c(linebf, "VAR", 0)) != STR_ERROR && ppos == 0) {
+            string_replace_c_m(linebf, ":", " = ", 0);
+            string_replace_c_m(linebf, ";", " ", 0);
+        }
+
+        //// cal/var expanded format ////
 
         if (!is_expanded) {
             String tmp = string_new_c(linebf->data);
+
+            string_toupper_m(tmp);
+            string_trim_m(tmp);
+
             if ((ppos = string_find_c(tmp, ": ", 0)) != STR_ERROR) {
                 string_right_m(tmp, ppos + 2);
             }
             if ((ppos = string_find_c(tmp, ";", 0)) != STR_ERROR) {
                 string_left_m(tmp, ppos - 1);
             }
+
             string_trim_m(tmp);
-            string_toupper_m(tmp);
+
             parse_command(tmp, &il_tmp);
             if (il_tmp->code == IL_CAL || il_tmp->code == IL_CAI) {
                 if ((ppos = string_find_c(tmp, "(", 0)) != STR_ERROR && (ppos = string_find_c(tmp, ")", 0)) == STR_ERROR) {
                     expanded = string_new_c(tmp->data);
-                    DBG_PRINT("[ >> is expanded << ]\n  >> [%s]\n", expanded->data);
+                    DBG_PRINT("[ >> is expanded (CAL) << ]\n  >> [%s]\n", expanded->data);
                     is_expanded = true;
+                    is_var = false;
                     free(tmp);
                     free(linebf);
                     continue;
                 }
             }
+
+            if (il_tmp->code == IL_VAI && (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
+                expanded = string_new_c(tmp->data);
+                DBG_PRINT("[ >> is expanded (VAR) << ]\n  >> [%s]\n", expanded->data);
+                is_expanded = true;
+                is_var = true;
+                free(tmp);
+                free(linebf);
+                continue;
+            }
+
             free(tmp);
         } else {
             String tmp = string_new_c(linebf->data);
+
+            // modify VAR
+            if (il_tmp->code == IL_VAI) {
+                string_replace_c_m(tmp, ":", " =", 0);
+                string_replace_c_m(tmp, ";", " ", 0);
+            }
+
             if ((ppos = string_find_c(tmp, ";", 0)) != STR_ERROR) {
                 string_left_m(tmp, ppos - 1);
             }
+
+            string_concat_m(expanded, spc);
             string_concat_m(expanded, tmp);
+
             free(tmp);
             DBG_PRINT("  >> [%s]\n", expanded->data);
-            if ((ppos = string_find_c(expanded, ")", 0)) == STR_ERROR) {
+
+            if (!is_var && (ppos = string_find_c(expanded, ")", 0)) == STR_ERROR) {
+                free(linebf);
+                continue;
+            }
+
+            if (is_var && (ppos = string_find_c(expanded, "END_VAR", 0)) == STR_ERROR) {
                 free(linebf);
                 continue;
             }
@@ -419,10 +462,17 @@ static int load_file(char *file, String **program) {
 
         /////////////////////////
 
+        //// var expanded format ////
+
+
+
+        /////////////////////////////
+
         *program = realloc(*program, (lines + 1) * sizeof(String));
         if (!is_expanded)
             (*program)[lines++] = string_new_c(linebf->data);
         else {
+
             (*program)[lines++] = string_new_c(expanded->data);
             free(expanded);
             is_expanded = false;
@@ -431,6 +481,7 @@ static int load_file(char *file, String **program) {
         free(linebf);
     }
 
+    free(spc);
     free(line_buf);
     free(il_tmp);
     fclose(f);
@@ -1024,7 +1075,9 @@ static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **r
         case LIT_CAL:
             parse_cal(value, &((*result)));
             break;
+        case LIT_VAI:
 
+            break;
     }
 }
 
@@ -1057,7 +1110,7 @@ void parse_command(String line, il_t **result) {
     (*result)->n = 0;
     (*result)->p = 0;
 
-    for (uint32_t cmd = 0; cmd < 56; cmd++) {
+    for (uint32_t cmd = 0; cmd < 57; cmd++) {
         if (string_equals_c(left, commands[cmd].str)) {
             (*result)->code = commands[cmd].code;
             (*result)->c = commands[cmd].c;
@@ -1066,6 +1119,7 @@ void parse_command(String line, il_t **result) {
             break;
         }
     }
+
     if ((*result)->code == STR_ERROR)
         (*result)->code = IL_CAI;
 
@@ -1157,6 +1211,9 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
         if (parsed->result[line]->code == IL_CAL || parsed->result[line]->code == IL_CAI)
             parsed->result[line]->lit_dataformat = LIT_CAL;
 
+        if (parsed->result[line]->code == IL_VAI)
+            parsed->result[line]->lit_dataformat = LIT_VAI;
+
         DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n",
                 parsed->result[line]->code,
                 parsed->result[line]->code,
@@ -1183,7 +1240,8 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
         if (
                 parsed->result[line]->lit_dataformat != LIT_STRING &&
                 parsed->result[line]->lit_dataformat != LIT_VAR    &&
-                parsed->result[line]->lit_dataformat != LIT_CAL
+                parsed->result[line]->lit_dataformat != LIT_CAL    &&
+                parsed->result[line]->lit_dataformat != LIT_VAI
            )
         {
             string_toupper_m(value);

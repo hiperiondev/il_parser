@@ -47,11 +47,23 @@ end:      ST %q0.0
               OUT1=>FO1,
               OUT2=>FO2
           )
- label_test1: GEN_FUN_EXP ( ;comment
+ lbl_1:  GEN_FUN_EXP ( ;comment
               RESET:=%IX3.6,
               PVv_5:=Limit,
               _aCU:=145,
               _sTR_:="str_test",
               OUT1=>FO1,
               OUT2=>FO2)
-          
+              
+         VAR C10: CTU; END_VAR
+         VAR
+             C10: CTU;
+             CMD_TMR: TON;
+             A, B: INT;
+             ELAPSED: TIME;
+             OUT, ERR, TEMPL, COND: BOOL;
+         END_VAR 
+         
+         
+         
+        

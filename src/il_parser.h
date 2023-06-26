@@ -70,14 +70,14 @@ typedef enum COMMANDS {
     IL_CAL, //  0x14 |    CN     |  Call of a program or a function block.
     IL_RET, //  0x15 |    CN     |  Return from subroutine.
     IL_POP, //  0x16 |           |  Pop from stack.
-    IL_CAI, //  0x17 |           |  Call implicit (function)
+    IL_17,  //  0x17 |           |  not defined.
     IL_18,  //  0x18 |           |  not defined.
     IL_19,  //  0x19 |           |  not defined.
     IL_1A,  //  0x1a |           |  not defined.
     IL_1B,  //  0x1b |           |  not defined.
     IL_1C,  //  0x1c |           |  not defined.
-    IL_1D,  //  0x1d |           |  not defined.
-    IL_1E,  //  0x1e |           |  not defined.
+    IL_VAI, //  0x1d |           |  Variables definition (internal use).
+    IL_CAI, //  0x1e |           |  Call implicit (function) (internal use)
     IL_END  //  0x1f |           |  Program end.
 } il_commands_t;
 
@@ -97,6 +97,7 @@ typedef enum DATAFORMAT {
     LIT_STRING,        // 0x0c
     LIT_VAR,           // 0x0d
     LIT_CAL,           // 0x0e
+    LIT_VAI,           // 0x0f
     /* ... */
     LIT_NONE
 } il_dataformat_t;
