@@ -107,7 +107,7 @@ static const il_str_t commands[] = {
   { "RETCN", IL_RET, 1, 1, 0 }, // 53
   { "RETNC", IL_RET, 1, 1, 0 }, // 54
   { ")"    , IL_POP, 0, 0, 0 }, // 55
-  { "VAR"  , IL_VAI, 0, 0, 0 }, // 56
+  { "VAR"  , IL_VAD, 0, 0, 0 }, // 56
   { ""     , IL_END, 0, 0, 0 }  // 57
 };
 
@@ -141,7 +141,7 @@ static const char *il_commands_str[] = {
         "???", // 0x1a
         "???", // 0x1b
         "???", // 0x1c
-        "VAR", // 0x1d (internal use)
+        "VAD", // 0x1d (internal use)
         "CAL", // 0x1e (internal use)
         "END", // 0x1f
 };
@@ -162,7 +162,7 @@ static const char *lit_dataformat_str[] = {
     "LIT_STRING",        // 0x0d
     "LIT_VAR",           // 0x0e
     "LIT_CAL",           // 0x0f
-    "LIT_VAI",           // 0x10
+    "LIT_VAD",           // 0x10
     "LIT_NONE"           // 0x11
 };
 
@@ -418,7 +418,7 @@ static int load_file(char *file, String **program) {
                 }
             }
 
-            if (il_tmp->code == IL_VAI && (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
+            if (il_tmp->code == IL_VAD && (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
                 expanded = string_new_c(tmp->data);
                 DBG_PRINT("[ >> is expanded (VAR) << ]\n  >> [%s]\n", expanded->data);
                 is_expanded = true;
@@ -428,15 +428,48 @@ static int load_file(char *file, String **program) {
                 continue;
             }
 
+            if (il_tmp->code == IL_VAD) {
+                uint32_t pos;
+                while ((pos = string_find_c(linebf, " = ", 0)) != STR_ERROR) {
+                    string_replace_c_m(linebf, " = ", "=", 0);
+                }
+                while ((pos = string_find_c(linebf, "= ", 0)) != STR_ERROR) {
+                    string_replace_c_m(linebf, "= ", "=", 0);
+                }
+                while ((pos = string_find_c(linebf, ", ", 0)) != STR_ERROR) {
+                    string_replace_c_m(linebf, ", ", ",", 0);
+                }
+
+                while ((pos = string_find_c(linebf, "  ", 0)) != STR_ERROR) {
+                    string_replace_c_m(linebf, "  ", " ", 0);
+                }
+            }
+
             free(tmp);
         } else {
             String tmp = string_new_c(linebf->data);
 
             // modify VAR
-            if (il_tmp->code == IL_VAI) {
+            if (il_tmp->code == IL_VAD) {
                 string_replace_c_m(tmp, ":", " =", 0);
                 string_replace_c_m(tmp, ";", " ", 0);
+
+                uint32_t pos;
+                while ((pos = string_find_c(expanded, " = ", 0)) != STR_ERROR) {
+                    string_replace_c_m(expanded, " = ", "=", 0);
+                }
+                while ((pos = string_find_c(expanded, "= ", 0)) != STR_ERROR) {
+                    string_replace_c_m(expanded, "= ", "=", 0);
+                }
+                while ((pos = string_find_c(expanded, ", ", 0)) != STR_ERROR) {
+                    string_replace_c_m(expanded, ", ", ",", 0);
+                }
+
+                while ((pos = string_find_c(expanded, "  ", 0)) != STR_ERROR) {
+                    string_replace_c_m(expanded, "  ", " ", 0);
+                }
             }
+            ////////////////
 
             if ((ppos = string_find_c(tmp, ";", 0)) != STR_ERROR) {
                 string_left_m(tmp, ppos - 1);
@@ -462,17 +495,10 @@ static int load_file(char *file, String **program) {
 
         /////////////////////////
 
-        //// var expanded format ////
-
-
-
-        /////////////////////////////
-
         *program = realloc(*program, (lines + 1) * sizeof(String));
         if (!is_expanded)
             (*program)[lines++] = string_new_c(linebf->data);
         else {
-
             (*program)[lines++] = string_new_c(expanded->data);
             free(expanded);
             is_expanded = false;
@@ -972,6 +998,63 @@ static void parse_cal(String value, il_t **result) {
     free(pos_var);
 }
 
+static void parse_vad(String value, il_t **result) {
+    uint32_t pos, vars_qty;
+    String *vars;
+
+    string_replace_c_m(value, "END_VAR", "", 0);
+    string_trim_m(value);
+
+    (*result)->data.vad.len = 0;
+    (*result)->data.vad.var = malloc(sizeof(String));
+    (*result)->data.vad.value = malloc(sizeof(String));
+
+    if ((vars_qty = string_split_array(value, " ", &vars)) == 0) {
+        vars_qty = 1;
+        vars = malloc(sizeof(String*));
+        vars[0] = string_new_c(value->data);
+    }
+
+    for (uint32_t n = 0; n < vars_qty; n++) {
+        if ((pos = string_find_c(vars[n], "=", 0)) != STR_ERROR) {
+            String left = string_left(vars[n], pos - 1);
+            String right = string_right(vars[n], pos + 1);
+
+            uint32_t vq;
+            String *vr = NULL;
+
+            if ((vq = string_split_array(left, ",", &vr)) == 0) {
+                vq = 1;
+                vr = malloc(sizeof(String*));
+                vr[0] = string_new_c(left->data);
+            }
+
+            for (uint32_t r = 0; r < vq; r++) {
+                (*result)->data.vad.var = realloc((*result)->data.vad.var, ((*result)->data.vad.len + 1) * sizeof(String));
+                (*result)->data.vad.value = realloc((*result)->data.vad.value, ((*result)->data.vad.len + 1) * sizeof(String));
+
+                (*result)->data.vad.var[(*result)->data.vad.len] = string_new_c(vr[r]->data);
+                (*result)->data.vad.value[(*result)->data.vad.len] = string_new_c(right->data);
+                DBG_PRINT("        [%s : %s]\n",
+                        (*result)->data.vad.var[(*result)->data.vad.len]->data,
+                        (*result)->data.vad.value[(*result)->data.vad.len]->data
+                );
+
+                ++(*result)->data.vad.len;
+
+                free(vr[r]);
+            }
+            free(vr);
+            free(left);
+            free(right);
+        }
+        free(vars[n]);
+    }
+    free(vars);
+}
+
+//////////////////////////////////////////////////////////////
+
 static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **result) {
     switch (lit_dataformat) {
         case LIT_BOOLEAN:
@@ -1075,8 +1158,8 @@ static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **r
         case LIT_CAL:
             parse_cal(value, &((*result)));
             break;
-        case LIT_VAI:
-
+        case LIT_VAD:
+            parse_vad(value, &((*result)));
             break;
     }
 }
@@ -1175,6 +1258,15 @@ void free_il(il_t **il) {
             free((*il)->data.cal.var);
             free((*il)->data.cal.value);
             break;
+        case LIT_VAD:
+            for (uint32_t n = 0; n < (*il)->data.vad.len; n++) {
+                free((*il)->data.vad.value[n]);
+                free((*il)->data.vad.var[n]);
+            }
+
+            free((*il)->data.vad.value);
+            free((*il)->data.vad.var);
+            break;
     }
 
     free(*il);
@@ -1211,8 +1303,8 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
         if (parsed->result[line]->code == IL_CAL || parsed->result[line]->code == IL_CAI)
             parsed->result[line]->lit_dataformat = LIT_CAL;
 
-        if (parsed->result[line]->code == IL_VAI)
-            parsed->result[line]->lit_dataformat = LIT_VAI;
+        if (parsed->result[line]->code == IL_VAD)
+            parsed->result[line]->lit_dataformat = LIT_VAD;
 
         DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n",
                 parsed->result[line]->code,
@@ -1241,7 +1333,7 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
                 parsed->result[line]->lit_dataformat != LIT_STRING &&
                 parsed->result[line]->lit_dataformat != LIT_VAR    &&
                 parsed->result[line]->lit_dataformat != LIT_CAL    &&
-                parsed->result[line]->lit_dataformat != LIT_VAI
+                parsed->result[line]->lit_dataformat != LIT_VAD
            )
         {
             string_toupper_m(value);

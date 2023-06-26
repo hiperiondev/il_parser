@@ -1032,27 +1032,26 @@ String string_split(const String buf, const char *search, String *right) {
  * @param array Array of strings
  * @return len Array string
  */
-uint32_t string_split_array(const String buf, const char *search, String **array) {
+uint32_t string_split_array(String buf, const char *search, String **array) {
     if (buf == NULL || search == NULL)
         return 0;
     uint32_t arr_len = 0;
-    uint32_t pos = 0, pos_ant = 0;
+    uint32_t pos = 0;
 
     if (string_find_c(buf, search, 0) != STR_ERROR)
         (*array) = malloc(sizeof(String));
-    while ((pos = string_find_c(buf, search, pos)) != STR_ERROR) {
-        (*array) = realloc((*array), (arr_len + 1) * sizeof(String));
-        (*array)[arr_len] = string_mid(buf, pos_ant + 1, pos);
+    else
+        return 0;
 
-        pos += strlen(search);
-        pos_ant = pos;
-        arr_len++;
+    while ((pos = string_find_c(buf, search, 0)) != STR_ERROR) {
+        (*array) = realloc((*array), (arr_len + 1) * sizeof(String));
+        (*array)[arr_len++] = string_left(buf, pos - 1);
+        string_right_m(buf, pos + strlen(search));
     }
 
-    if (pos_ant < buf->length) {
+    if (buf->length > 1) {
         (*array) = realloc((*array), (arr_len + 1) * sizeof(String));
-        (*array)[arr_len] = string_right(buf, pos_ant);
-        arr_len++;
+        (*array)[arr_len++] = string_new_c(buf->data);
     }
 
     return arr_len;

@@ -130,11 +130,11 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
 [ >> is expanded (VAR) << ]
   >> [VAR]
   >> [VAR C10 = CTU ]
-  >> [VAR C10 = CTU  CMD_TMR = TON ]
-  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT ]
-  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME ]
-  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL ]
-  >> [VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL  END_VAR]
+  >> [VAR C10=CTU  CMD_TMR = TON ]
+  >> [VAR C10=CTU CMD_TMR=TON  A, B = INT ]
+  >> [VAR C10=CTU CMD_TMR=TON A,B=INT  ELAPSED = TIME ]
+  >> [VAR C10=CTU CMD_TMR=TON A,B=INT ELAPSED=TIME  OUT, ERR, TEMPL, COND = BOOL ]
+  >> [VAR C10=CTU CMD_TMR=TON A,B=INT ELAPSED=TIME OUT,ERR,TEMPL,COND=BOOL  END_VAR]
 [ >> end expanded << ]
 
 [LABELS]
@@ -373,11 +373,20 @@ IEC61131-3 IL parser (edition 3.0 2013-02)
     [ OUT2 [in/out: 1] lit_dataformat: LIT_VAR, iec_datatype: NULL# ]
         [variable: FO2]
 
-[0042] VAR C10 =  CTU  END_VAR
-    [code: 29(0x1d)[VAR], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAI, iec_datatype: NULL#]
+[0042] VAR C10=CTU END_VAR
+    [code: 29(0x1d)[VAD], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAD, iec_datatype: NULL#]
+        [C10 : CTU]
 
-[0043] VAR C10 = CTU  CMD_TMR = TON  A, B = INT  ELAPSED = TIME  OUT, ERR, TEMPL, COND = BOOL  END_VAR
-    [code: 29(0x1d)[VAR], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAI, iec_datatype: NULL#]
+[0043] VAR C10=CTU CMD_TMR=TON A,B=INT ELAPSED=TIME OUT,ERR,TEMPL,COND=BOOL  END_VAR
+    [code: 29(0x1d)[VAD], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_VAD, iec_datatype: NULL#]
+        [C10 : CTU]
+        [CMD_TMR : TON]
+        [A : INT]
+        [ELAPSED : TIME]
+        [OUT : BOOL]
+        [ERR : BOOL]
+        [TEMPL : BOOL]
+        [COND : BOOL]
 
 [0044] END
     [code: 31(0x1f)[END], conditional: 0, negate: 0, push: 0, lit_dataformat: LIT_NONE, iec_datatype: NULL#]

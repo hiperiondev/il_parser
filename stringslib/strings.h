@@ -112,7 +112,7 @@ typedef struct string_hash_s string_hash_t; /**< hash result type >**/
        String string_rtrim(const String buf);
        String string_trim(const String buf);
        String string_split(const String buf, const char *search, String *right);
-     uint32_t string_split_array(const String buf, const char *search, String **array);
+     uint32_t string_split_array(String buf, const char *search, String **array);
 
      uint32_t string_find(const String buf, const String search, uint32_t pos);
      uint32_t string_find_c(const String buf, const char *csearch, uint32_t pos);
