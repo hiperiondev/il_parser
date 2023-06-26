@@ -393,7 +393,7 @@ static int load_file(char *file, String **program) {
             parse_command(tmp, &il_tmp);
             if (il_tmp->code == IL_CAL || il_tmp->code == IL_CAI) {
                 if ((ppos = string_find_c(tmp, "(", 0)) != STR_ERROR && (ppos = string_find_c(tmp, ")", 0)) == STR_ERROR) {
-                    expanded = string_new_c(linebf->data);
+                    expanded = string_new_c(tmp->data);
                     DBG_PRINT("[ >> is expanded << ]\n  >> [%s]\n", expanded->data);
                     is_expanded = true;
                     free(tmp);
@@ -403,7 +403,12 @@ static int load_file(char *file, String **program) {
             }
             free(tmp);
         } else {
-            string_concat_m(expanded, linebf);
+            String tmp = string_new_c(linebf->data);
+            if ((ppos = string_find_c(tmp, ";", 0)) != STR_ERROR) {
+                string_left_m(tmp, ppos - 1);
+            }
+            string_concat_m(expanded, tmp);
+            free(tmp);
             DBG_PRINT("  >> [%s]\n", expanded->data);
             if ((ppos = string_find_c(expanded, ")", 0)) == STR_ERROR) {
                 free(linebf);
