@@ -75,7 +75,7 @@ typedef enum COMMANDS {
     IL_19,  //  0x19 |           |  not defined.
     IL_1A,  //  0x1a |           |  not defined.
     IL_1B,  //  0x1b |           |  not defined.
-    IL_1C,  //  0x1c |           |  not defined.
+    IL_VAO, //  0x1c |           |  Variables definition (internal use).
     IL_VAD, //  0x1d |           |  Variables definition (internal use).
     IL_CAI, //  0x1e |           |  Call implicit (function) (internal use)
     IL_END  //  0x1f |           |  Program end.
@@ -97,7 +97,8 @@ typedef enum DATAFORMAT {
     LIT_STRING,        // 0x0c
     LIT_VAR,           // 0x0d
     LIT_CAL,           // 0x0e
-    LIT_VAD,           // 0x0f
+    LIT_VAO,           // 0x0f
+    LIT_VAD,           // 0x10
     /* ... */
     LIT_NONE
 } il_dataformat_t;
@@ -212,6 +213,7 @@ struct il {
         } cal;                          //
         struct {
             uint32_t len;               //
+                bool output;            //
               String *var;              //
               String *value;            //
         } vad;                          //

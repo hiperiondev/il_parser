@@ -63,3 +63,9 @@ end:      ST %q0.0
              ELAPSED: TIME;
              OUT, ERR, TEMPL, COND: BOOL;
          END_VAR
+         VAR_OUTPUT
+             C20: CTU;
+             A2, B2: INT;
+             ELAPSED2: TIME;
+         END_VAR
+         

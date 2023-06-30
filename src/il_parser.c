@@ -107,8 +107,9 @@ static const il_str_t commands[] = {
   { "RETCN", IL_RET, 1, 1, 0 }, // 53
   { "RETNC", IL_RET, 1, 1, 0 }, // 54
   { ")"    , IL_POP, 0, 0, 0 }, // 55
-  { "VAR"  , IL_VAD, 0, 0, 0 }, // 56
-  { ""     , IL_END, 0, 0, 0 }  // 57
+  { "VAR_OUTPUT"  , IL_VAO, 0, 0, 0 }, // 56
+  { "VAR"  , IL_VAD, 0, 0, 0 }, // 57
+  { ""     , IL_END, 0, 0, 0 }  // 58
 };
 
 static const char *il_commands_str[] = {
@@ -140,9 +141,9 @@ static const char *il_commands_str[] = {
         "???", // 0x19
         "???", // 0x1a
         "???", // 0x1b
-        "???", // 0x1c
-        "VAD", // 0x1d (internal use)
-        "CAL", // 0x1e (internal use)
+        "VAO", // 0x1c
+        "VAD", // 0x1d
+        "CAL", // 0x1e
         "END", // 0x1f
 };
 
@@ -162,8 +163,9 @@ static const char *lit_dataformat_str[] = {
     "LIT_STRING",        // 0x0d
     "LIT_VAR",           // 0x0e
     "LIT_CAL",           // 0x0f
-    "LIT_VAD",           // 0x10
-    "LIT_NONE"           // 0x11
+    "LIT_VAO",           // 0x10
+    "LIT_VAD",           // 0x11
+    "LIT_NONE"           // 0x12
 };
 
 static const char *pfx_dataformat[] = {
@@ -389,7 +391,7 @@ static int load_file(char *file, String **program) {
         string_trim_m(linebf);
 
         // modify VAR
-        if ((ppos = string_find_c(linebf, "VAR", 0)) != STR_ERROR && ppos == 0) {
+        if (((ppos = string_find_c(linebf, "VAR", 0)) != STR_ERROR || (ppos = string_find_c(linebf, "VAR_OUTPUT", 0)) != STR_ERROR) && ppos == 0) {
             string_replace_c_m(linebf, ":", " = ", 0);
             string_replace_c_m(linebf, ";", " ", 0);
         }
@@ -424,7 +426,7 @@ static int load_file(char *file, String **program) {
                 }
             }
 
-            if (il_tmp->code == IL_VAD && (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
+            if ((il_tmp->code == IL_VAD || il_tmp->code == IL_VAO)&& (ppos = string_find_c(tmp, "END_VAR", 0)) == STR_ERROR) {
                 expanded = string_new_c(tmp->data);
                 DBG_PRINT("[ start expanded (VAR) ]\n    [ %s ]\n", tmp->data);
                 is_expanded = true;
@@ -434,7 +436,7 @@ static int load_file(char *file, String **program) {
                 continue;
             }
 
-            if (il_tmp->code == IL_VAD) {
+            if (il_tmp->code == IL_VAD || il_tmp->code == IL_VAO) {
                 uint32_t pos;
                 while ((pos = string_find_c(linebf, " = ", 0)) != STR_ERROR) {
                     string_replace_c_m(linebf, " = ", "=", 0);
@@ -456,7 +458,7 @@ static int load_file(char *file, String **program) {
             String tmp = string_new_c(linebf->data);
 
             // modify VAR
-            if (il_tmp->code == IL_VAD) {
+            if (il_tmp->code == IL_VAD || il_tmp->code == IL_VAO) {
                 string_replace_c_m(tmp, ":", " =", 0);
                 string_replace_c_m(tmp, ";", " ", 0);
 
@@ -1166,6 +1168,15 @@ static void parse_literal(String value, il_dataformat_t lit_dataformat, il_t **r
             break;
         case LIT_VAD:
             parse_vad(value, &((*result)));
+            (*result)->data.vad.output = 0;
+            DBG_PRINT("          [is_output: %d]\n", (*result)->data.vad.output);
+
+            break;
+        case LIT_VAO:
+            parse_vad(value, &((*result)));
+            (*result)->data.vad.output = 1;
+            (*result)->lit_dataformat = LIT_VAD;
+            DBG_PRINT("          [is_output: %d]\n", (*result)->data.vad.output);
             break;
     }
 }
@@ -1199,7 +1210,7 @@ void parse_command(String line, il_t **result) {
     (*result)->n = 0;
     (*result)->p = 0;
 
-    for (uint32_t cmd = 0; cmd < 57; cmd++) {
+    for (uint32_t cmd = 0; cmd < 58; cmd++) {
         if (string_equals_c(left, commands[cmd].str)) {
             (*result)->code = commands[cmd].code;
             (*result)->c = commands[cmd].c;
@@ -1269,7 +1280,6 @@ void free_il(il_t **il) {
                 free((*il)->data.vad.value[n]);
                 free((*il)->data.vad.var[n]);
             }
-
             free((*il)->data.vad.value);
             free((*il)->data.vad.var);
             break;
@@ -1311,6 +1321,10 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
 
         if (parsed->result[line]->code == IL_VAD)
             parsed->result[line]->lit_dataformat = LIT_VAD;
+        if (parsed->result[line]->code == IL_VAO) {
+            parsed->result[line]->lit_dataformat = LIT_VAO;
+            parsed->result[line]->code = IL_VAD;
+        }
 
         DBG_PRINT("    [code: %d(0x%02x)[%s], conditional: %d, negate: %d, push: %d, lit_dataformat: %s, iec_datatype: %s]\n",
                 parsed->result[line]->code,
@@ -1339,7 +1353,8 @@ void parse_file_il(char *file, parsed_il_t *parsed) {
                 parsed->result[line]->lit_dataformat != LIT_STRING &&
                 parsed->result[line]->lit_dataformat != LIT_VAR    &&
                 parsed->result[line]->lit_dataformat != LIT_CAL    &&
-                parsed->result[line]->lit_dataformat != LIT_VAD
+                parsed->result[line]->lit_dataformat != LIT_VAD    &&
+                parsed->result[line]->lit_dataformat != LIT_VAO
            )
         {
             string_toupper_m(value);
